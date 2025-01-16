@@ -54,6 +54,11 @@
                 "glob": "constellation-core.*.*",
                 "input": "./node_modules/@pega/constellationjs/dist/",
                 "output": "./constellation/prerequisite"
+              },
+              {
+                "glob": "auth.html",
+                "input": "./node_modules/@typescale/dx-engine/",
+                "output": "."
               }
             ],
             "styles": [
