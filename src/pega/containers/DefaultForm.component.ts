@@ -14,21 +14,21 @@ import { PContainerComponent } from '@typescale/angular-adapter';
   `,
   styles: [
     `
-      .one-column > * {
+      .one-column {
         display: grid;
         grid-template-columns: repeat(1, 1fr);
         gap: calc(1rem);
       }
     `,
     `
-      .two-column > * {
+      .two-column {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: calc(1rem);
       }
     `,
     `
-      .three-column > * {
+      .three-column {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: calc(1rem);
@@ -56,6 +56,9 @@ export class DefaultFormComponent
       default:
         this.divClass = 'one-column';
         break;
+    }
+    if (this.container.children.length <= 2) {
+      this.divClass = 'one-column';
     }
   }
 }

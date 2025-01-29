@@ -9,9 +9,11 @@ import { AddressLookupComponent } from './containers/AddressLookup.component';
 import { AppShellComponent } from './containers/AppShell.component';
 import { AttachmentComponent } from './containers/Attachment.component';
 import { CaseViewComponent } from './containers/CaseView.component';
+import { CheckboxComponent } from './containers/Checkbox.component';
 import { DefaultComponent } from './containers/Default.component';
 import { DefaultFormComponent } from './containers/DefaultForm.component';
 import { DetailsComponent } from './containers/Details.component';
+import { DetailsThreeColumnComponent } from './containers/DetailsThreeColumns';
 import { DropdownComponent } from './containers/Dropdown.component';
 import { FlowContainerComponent } from './containers/FlowContainer.component';
 import { ModalViewContainerComponent } from './containers/ModalViewContainer.component';
@@ -38,7 +40,9 @@ import { TextInputComponent } from './containers/TextInput.component';
     TextAreaComponent,
     RichTextComponent,
     DetailsComponent,
-    AddressLookupComponent
+    AddressLookupComponent,
+    CheckboxComponent,
+    DetailsThreeColumnComponent
   ],
   providers: [
     {
@@ -60,9 +64,10 @@ import { TextInputComponent } from './containers/TextInput.component';
         RootContainer: DefaultComponent,
         View: DefaultComponent,
         ViewContainer: DefaultComponent,
+        DetailsThreeColumn: DetailsThreeColumnComponent,
         // controls
         Attachment: AttachmentComponent,
-        Checkbox: TextInputComponent,
+        Checkbox: CheckboxComponent,
         Currency: TextInputComponent,
         Date: TextInputComponent,
         DateTime: TextInputComponent,

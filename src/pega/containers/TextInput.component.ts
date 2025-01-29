@@ -6,11 +6,13 @@ import { PContainerComponent } from '@typescale/angular-adapter';
   selector: 'dx-text-input-control',
   template: `<label
     >{{ label }}{{ container.config.required ? ' *' : '' }}
-    <input
+    <span *ngIf="container.config.readOnly">{{container.config.value || '--'}}</span>
+    <input *ngIf="!container.config.readOnly"
       [type]="type"
       [attr.inputmode]="inputmode"
       [attr.step]="step"
       [attr.readonly]="container.config.readOnly"
+      [attr.placeholder]="container.config.placeholder"
       [formControl]="control"
       (change)="container.updateFieldValue(getValue($event.target))"
       (blur)="container.triggerFieldChange(getValue($event.target))"
@@ -93,7 +95,7 @@ export class TextInputComponent extends PContainerComponent implements OnInit {
       case 'number':
         return t.valueAsNumber;
       case 'date':
-        return t.valueAsDate;
+        return t.valueAsDate?.toISOString().split('T')[0] || null;
       case 'checkbox':
         return t.checked;
       default:
