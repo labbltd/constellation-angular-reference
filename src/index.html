@@ -1,13 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>Constellation Angular Reference</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>DX Accelerator</title>
+  <style>
+    input:not([type="radio"]):not([type="checkbox"]),
+    select {
+      width: 100%;
+    }
+
+    .group:not(.readOnly) {
+      padding: 0.5rem;
+      border-radius: calc(0.25rem);
+      border: 0.0625rem solid rgb(207, 207, 207);
+      margin-block: calc(0.5rem);
+    }
+
+    .group.readOnly .body {
+      padding: 0.5rem;
+      border-left: 0.0625rem solid rgb(207, 207, 207);
+      margin-block: calc(0.5rem);
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid;
+      padding: 5px
+    }
+
+    dx-root {
+      display: block;
+      max-width: 80ch;
+      padding: 20px;
+    }
+  </style>
 </head>
+
 <body>
   <dx-case></dx-case>
 </body>
+
 </html>

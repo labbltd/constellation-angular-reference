@@ -4,6 +4,7 @@ import { PContainerComponent } from '@typescale/angular-adapter';
 @Component({
   selector: 'dx-default-form-template',
   template: `
+    <div *ngIf="container.config.instructions && container.config.instructions !== 'none'" [innerHtml]="container.config.instructions"></div>
     <div [ngClass]="divClass">
       <ng-template
         *ngFor="let child of container.children"
