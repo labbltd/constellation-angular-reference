@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { PContainerComponent } from '@typescale/angular-adapter';
-import { Attachment, FileStatus } from '@typescale/dx-engine';
+import { PContainerComponent } from '@labb/angular-adapter';
+import { Attachment, FileStatus } from '@labb/dx-engine';
 
 @Component({
   selector: 'dx-attachment-control',

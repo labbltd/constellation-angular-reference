@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { TokenInfo } from '@typescale/constellation-core-types';
-import { OAuth2Service } from '@typescale/dx-engine';
+import { TokenInfo } from '@labb/constellation-core-types';
+import { OAuth2Service } from '@labb/dx-engine';
 
 @Component({
   selector: 'dx-case',

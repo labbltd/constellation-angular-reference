@@ -57,7 +57,7 @@
               },
               {
                 "glob": "auth.html",
-                "input": "./node_modules/@typescale/dx-engine/",
+                "input": "./node_modules/@labb/dx-engine/",
                 "output": "."
               }
             ],
@@ -128,5 +128,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

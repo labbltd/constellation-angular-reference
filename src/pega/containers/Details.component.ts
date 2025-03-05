@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PContainerComponent } from '@typescale/angular-adapter';
-import { PContainer } from '@typescale/dx-engine';
+import { PContainerComponent } from '@labb/angular-adapter';
+import { PContainer } from '@labb/dx-engine';
 
 @Component({
   selector: 'dx-details-container',

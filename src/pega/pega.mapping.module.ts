@@ -4,7 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   DYNAMIC_CONTAINERS,
   PContainerModule,
-} from '@typescale/angular-adapter';
+} from '@labb/angular-adapter';
+import { ActionableButtonComponent } from './containers/ActionableButton.component';
 import { AddressLookupComponent } from './containers/AddressLookup.component';
 import { AppShellComponent } from './containers/AppShell.component';
 import { AttachmentComponent } from './containers/Attachment.component';
@@ -41,8 +42,9 @@ import { TextInputComponent } from './containers/TextInput.component';
     RichTextComponent,
     DetailsComponent,
     AddressLookupComponent,
+    DetailsThreeColumnComponent,
     CheckboxComponent,
-    DetailsThreeColumnComponent
+    ActionableButtonComponent
   ],
   providers: [
     {
@@ -84,7 +86,8 @@ import { TextInputComponent } from './containers/TextInput.component';
         Time: TextInputComponent,
         // custom controls
         Labb_dx_ButtonGroup: RadioButtonsComponent,
-        Labb_dx_Address: AddressLookupComponent
+        Labb_dx_Address: AddressLookupComponent,
+        Pega_Extensions_ActionableButton: ActionableButtonComponent
       },
       multi: true,
     },

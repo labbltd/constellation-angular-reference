@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { PContainerComponent } from '@typescale/angular-adapter';
+import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
   selector: 'dx-one-column-template',

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { PContainerModule } from '@typescale/angular-adapter';
+import { PContainerModule } from '@labb/angular-adapter';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { PegaComponent } from './pega.component';

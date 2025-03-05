@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { PContainerComponent } from '@typescale/angular-adapter';
+import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
   selector: 'dx-default-form-template',

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { PContainerComponent } from '@typescale/angular-adapter';
-import { ActionButton } from '@typescale/constellation-core-types';
-import { FlowContainer } from '@typescale/dx-engine';
+import { PContainerComponent } from '@labb/angular-adapter';
+import { ActionButton } from '@labb/constellation-core-types';
+import { FlowContainer } from '@labb/dx-engine';
 
 @Component({
   selector: 'dx-flow-container',

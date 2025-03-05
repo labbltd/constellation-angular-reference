@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { PContainerComponent } from '@typescale/angular-adapter';
+import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
   selector: 'dx-text-input-control',
