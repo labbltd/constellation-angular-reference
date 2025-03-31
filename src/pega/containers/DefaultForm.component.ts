@@ -43,7 +43,8 @@ export class DefaultFormComponent
   implements OnInit {
   public divClass = 'one-column';
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     switch (this.container.config.NumCols ? this.container.config.NumCols : '1') {
       case '1':
         this.divClass = 'one-column';

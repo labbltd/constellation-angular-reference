@@ -20,7 +20,8 @@ export class PegaComponent {
   public constructor() {
     this.infinityServer = 'http://localhost:3333/prweb';
     OAuth2Service.getTokenAuthorizationCode({
-      serverUrl: this.infinityServer,
+      authorizationUrl: `${this.infinityServer}/PRRestService/oauth2/v1/authorize`,
+      accessTokenUrl: `${this.infinityServer}/PRRestService/oauth2/v1/token`,
       deployUrl: this.deployUrl,
       clientId: '11680909344524843879',
       clientSecret: '769E32F2200BCBF7241827FD98D4F22E'

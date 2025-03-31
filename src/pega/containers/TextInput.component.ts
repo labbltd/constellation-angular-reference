@@ -4,10 +4,10 @@ import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
   selector: 'dx-text-input-control',
-  template: `<label
-    >{{ label }}{{ container.config.required ? ' *' : '' }}
-    <span *ngIf="container.config.readOnly">{{container.config.value || '--'}}</span>
-    <input *ngIf="!container.config.readOnly"
+  template: `
+  <ng-container *ngIf="container.config.readOnly"><dt>{{ label }}</dt><dd>{{container.config.value ?? '--'}}</dd></ng-container>
+  <label *ngIf="!container.config.readOnly">{{ label }}{{ container.config.required ? ' *' : '' }}
+    <input
       [type]="type"
       [attr.inputmode]="inputmode"
       [attr.step]="step"
@@ -19,7 +19,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
     />
     {{ container.config.helperText }}
     {{ container.config.validatemessage }}
-  </label> `,
+  </label>`
 })
 export class TextInputComponent extends PContainerComponent implements OnInit {
   public control = new FormControl('');
@@ -27,11 +27,11 @@ export class TextInputComponent extends PContainerComponent implements OnInit {
     return this.container.config.label || this.container.config.caption;
   }
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.control.setValue(this.container.config.value);
     this.container.updates.subscribe(() => {
-      const value = this.container.config.value;
-      this.control.setValue(value);
+      this.control.setValue(this.container.config.value);
     });
   }
 

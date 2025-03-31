@@ -44,7 +44,8 @@ export class AddressLookupComponent extends PContainerComponent implements OnIni
     };
 
 
-    public ngOnInit(): void {
+    public override ngOnInit(): void {
+      super.ngOnInit();
         this.control.valueChanges.pipe(take(1)).subscribe(async () => {
             this.searchResults = (await window.PCore.getDataApiUtils().getData<Address>('D_AddressesList', {})).data.data;
             if (this.searchResults) {

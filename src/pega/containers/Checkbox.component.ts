@@ -6,6 +6,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
   selector: 'dx-text-input-control',
   template: `
     <div>
+      <label [for]="container.id">
       <input
         [id]="container.id"
         type="checkbox"
@@ -14,8 +15,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
         (change)="container.updateFieldValue(getValue($event.target))"
         (blur)="container.triggerFieldChange(getValue($event.target))"
       />
-      <label [for]="container.id"
-      >{{ label }}{{ container.config.required ? ' *' : '' }}
+      {{ label }}{{ container.config.required ? ' *' : '' }}
       </label>
       {{ container.config.helperText }}
       {{ container.config.validatemessage }}
@@ -28,7 +28,8 @@ export class CheckboxComponent extends PContainerComponent implements OnInit {
     return this.container.config.label || this.container.config.caption;
   }
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.control.setValue(this.container.config.value);
     this.container.updates.subscribe(() => {
       this.control.setValue(this.container.config.value);

@@ -29,11 +29,11 @@ import { PContainerComponent } from '@labb/angular-adapter';
 export class DropdownComponent extends PContainerComponent implements OnInit {
   public control = new FormControl('');
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.control.setValue(this.container.config.value);
     this.container.updates.subscribe(() => {
-      const value = this.container.config.value;
-      this.control.setValue(value);
+      this.control.setValue(this.container.config.value);
     });
   }
 

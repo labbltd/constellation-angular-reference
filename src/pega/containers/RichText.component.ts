@@ -18,7 +18,8 @@ import { PContainerComponent } from '@labb/angular-adapter';
 export class RichTextComponent extends PContainerComponent implements OnInit {
   public control = new FormControl('');
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.control.setValue(this.container.config.value);
   }
 

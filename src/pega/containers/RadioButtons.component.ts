@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
@@ -21,7 +21,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
         </label>
       </ng-container>
       {{ container.config.helperText }}
-      {{ container.config.validatemessages }}
+      {{ container.config.validatemessage }}
     </fieldset>
   `,
 })

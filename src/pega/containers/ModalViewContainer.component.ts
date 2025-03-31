@@ -32,12 +32,17 @@ export class ModalViewContainerComponent extends PContainerComponent<ModalViewCo
   public loading = false;
   public errorMessage?: string;
 
-  public ngOnInit(): void {
+  public override ngOnInit(): void {
+    super.ngOnInit();
     this.container.updates.subscribe(() => {
       if (this.container.hasContainerItems()) {
-        this.dialog.nativeElement.showModal();
+        if (!this.dialog.nativeElement.open) {
+          this.dialog.nativeElement.showModal();
+        }
       } else {
-        this.dialog.nativeElement.close();
+        if (this.dialog.nativeElement.open) {
+          this.dialog.nativeElement.close();
+        }
       }
     })
   }

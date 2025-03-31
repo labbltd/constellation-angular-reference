@@ -23,6 +23,7 @@ import { RadioButtonsComponent } from './containers/RadioButtons.component';
 import { RichTextComponent } from './containers/RichText.component';
 import { TextAreaComponent } from './containers/TextArea.component';
 import { TextInputComponent } from './containers/TextInput.component';
+import { MultiselectComponent } from './containers/Multiselect.component';
 
 @NgModule({
   imports: [CommonModule, ReactiveFormsModule, PContainerModule],
@@ -44,7 +45,8 @@ import { TextInputComponent } from './containers/TextInput.component';
     AddressLookupComponent,
     DetailsThreeColumnComponent,
     CheckboxComponent,
-    ActionableButtonComponent
+    ActionableButtonComponent,
+    MultiselectComponent
   ],
   providers: [
     {
@@ -77,6 +79,7 @@ import { TextInputComponent } from './containers/TextInput.component';
         Dropdown: DropdownComponent,
         Email: TextInputComponent,
         Integer: TextInputComponent,
+        Multiselect: MultiselectComponent,
         Percentage: TextInputComponent,
         Phone: TextInputComponent,
         RadioButtons: RadioButtonsComponent,
