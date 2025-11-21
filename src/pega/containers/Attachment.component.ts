@@ -7,48 +7,58 @@ import { Attachment, FileStatus } from '@labb/dx-engine';
   template: `
     <label>
       {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
-      <input #fileInput type="file" 
-        (change)="upload($event)" 
-        [multiple]="allowMultiple"
-        *ngIf="allowMultiple || !container.files.length"
-      />
+      @if (allowMultiple || !container.files.length){
+        <input #fileInput type="file" 
+          (change)="upload($event)" 
+          [multiple]="allowMultiple"
+        />
+      }
       {{ container.config.helperText }}
       {{ container.config.validatemessage }}
       {{ container.config.extensions }}
     </label>
-    <table *ngIf="container.files?.length">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Size</th>
-          <th>Type</th>
-          <th>Uploaded</th>
-          <th>Error</th>
-          <th>Error Status</th>
-          <th>Progress</th>
-          <th>ID</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let file of container.files">
-          <td>{{file.name}}</td>
-          <td>{{file.size}}</td>
-          <td>{{file.type}}</td>
-          <td>{{file.uploaded}}</td>
-          <td>{{file.error}}</td>
-          <td>{{file.errorStatus}}</td>
-          <td>{{file.progress}}</td>
-          <td>{{file.id}}</td>
-          <td>
-            <button type="button" (click)="remove(file)">delete</button>
-            <button *ngIf="file.linked" (click)="download(file)">download</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <img *ngIf="downloadedImage" width="100%" [src]="'data:image/png;base64,' + downloadedImage" />
+    @if(container.files.length) {
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Type</th>
+            <th>Uploaded</th>
+            <th>Error</th>
+            <th>Error Status</th>
+            <th>Progress</th>
+            <th>ID</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(file of container.files; track file.id) {
+            <tr>
+              <td>{{file.name}}</td>
+              <td>{{file.size}}</td>
+              <td>{{file.type}}</td>
+              <td>{{file.uploaded}}</td>
+              <td>{{file.error}}</td>
+              <td>{{file.errorStatus}}</td>
+              <td>{{file.progress}}</td>
+              <td>{{file.id}}</td>
+              <td>
+                <button type="button" (click)="remove(file)">delete</button>
+                @if (file.linked) {
+                  <button (click)="download(file)">download</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if(downloadedImage) {
+      <img width="100%" [src]="'data:image/png;base64,' + downloadedImage" />
+    }
   `,
+  standalone: false
 })
 export class AttachmentComponent extends PContainerComponent<Attachment> {
   public downloadedImage?: string;

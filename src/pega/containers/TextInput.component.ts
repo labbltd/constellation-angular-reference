@@ -1,40 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
   selector: 'dx-text-input-control',
   template: `
-  <ng-container *ngIf="container.config.readOnly"><dt>{{ label }}</dt><dd>{{container.config.value ?? '--'}}</dd></ng-container>
-  <label *ngIf="!container.config.readOnly">{{ label }}{{ container.config.required ? ' *' : '' }}
+  <label>
+    {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
     <input
       [type]="type"
+      [value]="container.config.value"
       [attr.inputmode]="inputmode"
       [attr.step]="step"
-      [attr.readonly]="container.config.readOnly"
+      [attr.disabled]="container.config.disabled"
       [attr.placeholder]="container.config.placeholder"
-      [formControl]="control"
       (change)="container.updateFieldValue(getValue($event.target))"
       (blur)="container.triggerFieldChange(getValue($event.target))"
     />
     {{ container.config.helperText }}
     {{ container.config.validatemessage }}
-  </label>`
+  </label>`,
+  standalone: false
 })
 export class TextInputComponent extends PContainerComponent implements OnInit {
-  public control = new FormControl('');
-  public get label(): string {
-    return this.container.config.label || this.container.config.caption;
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-    this.control.setValue(this.container.config.value);
-    this.container.updates.subscribe(() => {
-      this.control.setValue(this.container.config.value);
-    });
-  }
-
   public get type(): string {
     switch (this.container.config.fieldMetadata?.type) {
       case 'Decimal':

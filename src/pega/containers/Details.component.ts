@@ -5,9 +5,15 @@ import { PContainerComponent } from '@labb/angular-adapter';
   selector: 'dx-details-container',
   template: `
     <dl>
-      <ng-container *ngFor="let child of container.children" dxContainer [container]="child"></ng-container>
+      @for (child of container.children; track child.id) {
+        <ng-container
+          dxContainer
+          [container]="child"
+        ></ng-container>
+      }
     </dl>
   `,
+  standalone: false
 })
 export class DetailsComponent extends PContainerComponent {
 }

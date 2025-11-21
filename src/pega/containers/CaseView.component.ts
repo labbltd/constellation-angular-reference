@@ -10,5 +10,6 @@ import { PContainerComponent } from '@labb/angular-adapter';
       [container]="child"
     ></ng-template>
   `,
+  standalone: false
 })
 export class CaseViewComponent extends PContainerComponent {}

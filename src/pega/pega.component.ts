@@ -5,12 +5,15 @@ import { OAuth2Service } from '@labb/dx-engine';
 @Component({
   selector: 'dx-case',
   template: `
-    <dx-pega-entry *ngIf="token"
+    @if (token) {
+      <dx-pega-entry
             caseTypeID="ATHO-Insurance-Work-LeningBerekenen"
             [infinityServer]="infinityServer"
             [deployUrl]="deployUrl"
             [token]="token"></dx-pega-entry>
-  `
+    }
+  `,
+  standalone: false
 })
 export class PegaComponent {
   public token!: TokenInfo;

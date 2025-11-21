@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
@@ -7,39 +6,26 @@ import { PContainerComponent } from '@labb/angular-adapter';
   template: `
     <div>
       <label [for]="container.id">
-      <input
-        [id]="container.id"
-        type="checkbox"
-        [attr.readonly]="container.config.readOnly"
-        [formControl]="control"
-        (change)="container.updateFieldValue(getValue($event.target))"
-        (blur)="container.triggerFieldChange(getValue($event.target))"
-      />
-      {{ label }}{{ container.config.required ? ' *' : '' }}
+        {{container.config.label}}
+        <input
+          [id]="container.id"
+          [checked]="container.config.value"
+          type="checkbox"
+          [attr.disabled]="container.config.disabled"
+          (change)="change($event)"
+        />
+        {{ container.config.caption }}{{ container.config.required ? ' *' : '' }}
       </label>
       {{ container.config.helperText }}
       {{ container.config.validatemessage }}
     </div>
    `,
+  standalone: false
 })
-export class CheckboxComponent extends PContainerComponent implements OnInit {
-  public control = new FormControl('');
-  public get label(): string {
-    return this.container.config.label || this.container.config.caption;
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-    this.control.setValue(this.container.config.value);
-    this.container.updates.subscribe(() => {
-      this.control.setValue(this.container.config.value);
-    });
-  }
-
-  public getValue(
-    target: EventTarget | null
-  ): number | Date | boolean | string | null {
-    const t: HTMLInputElement = target as HTMLInputElement;
-    return t.checked;
+export class CheckboxComponent extends PContainerComponent {
+  public change(event: Event) {
+    const value = (event.target as HTMLInputElement).checked;
+    this.container.updateFieldValue(value);
+    this.container.triggerFieldChange(value);
   }
 }

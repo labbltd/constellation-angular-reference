@@ -8,6 +8,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
       <button type="button" (click)="performAction()">{{container.config.label}}</button>
     </div>
   `,
+  standalone: false
 })
 export class ActionableButtonComponent extends PContainerComponent {
   public performAction() {

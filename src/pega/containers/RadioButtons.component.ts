@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
@@ -8,25 +8,28 @@ import { PContainerComponent } from '@labb/angular-adapter';
       <legend>
         {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
       </legend>
-      <ng-container *ngFor="let option of container.config.datasource">
+      @for (option of container.config.datasource; track option.key) {
         <label>
           <input
             type="radio"
-            (change)="container.updateFieldValue(getValue($event.target))"
-            (blur)="container.triggerFieldChange(getValue($event.target))"
+            [id]="container.id + '_' + option.key"
+            (change)="change($event)"
             [checked]="container.config.value === option.key"
             [name]="container.id"
             [value]="option.key"
           />{{ option.value }}
         </label>
-      </ng-container>
+      }
       {{ container.config.helperText }}
       {{ container.config.validatemessage }}
     </fieldset>
   `,
+  standalone: false
 })
 export class RadioButtonsComponent extends PContainerComponent {
-  public getValue(target: EventTarget | null): string {
-    return (target as HTMLInputElement).value;
+  public change(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.container.updateFieldValue(value);
+    this.container.triggerFieldChange(value);
   }
 }

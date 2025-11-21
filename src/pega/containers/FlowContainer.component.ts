@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 import { ActionButton, Assignment } from '@labb/constellation-core-types';
 import { FlowContainer } from '@labb/dx-engine';
@@ -6,44 +6,54 @@ import { FlowContainer } from '@labb/dx-engine';
 @Component({
   selector: 'dx-flow-container',
   template: `
-    <ng-container *ngIf="!container.hasAssignment()">
-      <div *ngFor="let assignment of todoAssignments">
-        <div>{{assignment.processName}} > {{assignment.name}}</div>
-        <div>Assigned to {{assignment.assigneeInfo?.name}}</div>
-        <button type="button" (click)="openAssignment(assignment)">Go</button>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="container.hasAssignment()">
+    @if (!container.hasAssignment()) {
+      @for (assignment of todoAssignments; track assignment.ID) {
+        <div>
+          <div>{{assignment.processName}} > {{assignment.name}}</div>
+          <div>Assigned to {{assignment.assigneeInfo?.name}}</div>
+          <button type="button" (click)="openAssignment(assignment)">Go</button>
+        </div>
+      }
+    }
+    @if (container.hasAssignment()) {
       <h2>
         {{ container.getActiveViewLabel() || container.getAssignmentName() }}
       </h2>
-      <nav *ngIf="container.navigation">
-        <ol>
-          <li *ngFor="let step of container.navigation.steps">{{step.name}} [{{step.visited_status}}]</li>
-        </ol>
-      </nav>
-      <ng-template
-        *ngFor="let child of container.children"
-        dxContainer
-        [container]="child"
-      ></ng-template>
-      <ng-container *ngIf="container.actionButtons">
-        <button
-        *ngFor="let button of container.actionButtons.secondary"
-          [disabled]="loading"
-          (click)="buttonClick(button)">
-          {{ button.name }}
-        </button>
-        <button
-          *ngFor="let button of container.actionButtons.main"
-          [disabled]="loading"
-          (click)="buttonClick(button)">
-          {{ button.name }}
-        </button>
-      </ng-container>
+      @if (container.navigation) {
+        <nav>
+          <ol>
+            @for (step of container.navigation.steps; track step.ID) {
+              <li>{{step.name}} [{{step.visited_status}}]</li>
+            }
+          </ol>
+        </nav>
+      }
+      @for (child of container.children; track child.id) {
+        <ng-container
+          dxContainer
+          [container]="child"
+        ></ng-container>
+      }
+      @if (container.actionButtons) {
+        @for (button of container.actionButtons.secondary; track button.actionID) {
+          <button
+            [disabled]="loading"
+            (click)="buttonClick(button)">
+            {{ button.name }}
+          </button>
+        }
+        @for (button of container.actionButtons.main; track button.actionID) {
+          <button
+            [disabled]="loading"
+            (click)="buttonClick(button)">
+            {{ button.name }}
+          </button>
+        }
+      }
       <div>{{ errorMessage }}</div>
-    </ng-container>
-  `
+    }
+  `,
+  standalone: false
 })
 export class FlowContainerComponent extends PContainerComponent<FlowContainer> implements OnInit {
   public todoAssignments: Assignment[] = [];
@@ -77,8 +87,5 @@ export class FlowContainerComponent extends PContainerComponent<FlowContainer> i
 
   private updateAssignments(): void {
     this.todoAssignments = this.container.getTodoAssignments();
-    if (this.todoAssignments.length === 1 && !this.container.hasAssignment()) {
-      this.container.openAssignment(this.todoAssignments[0]);
-    }
   }
 }

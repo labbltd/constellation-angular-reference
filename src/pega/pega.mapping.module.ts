@@ -53,7 +53,6 @@ import { MultiselectComponent } from './containers/Multiselect.component';
       provide: DYNAMIC_CONTAINERS,
       useValue: {
         default: DefaultComponent,
-        Child: DefaultComponent,
         // layouts
         AppShell: AppShellComponent,
         CaseView: CaseViewComponent,

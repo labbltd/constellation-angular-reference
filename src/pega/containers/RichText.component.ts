@@ -1,37 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
-  selector: 'dx-rich-text-area-control',
+  selector: 'dx-rich-text-control',
   template: `<label
     >{{ container.config.label }}{{ container.config.required ? ' *' : '' }}
     <textarea
-      [formControl]="control"
+      [value]="container.config.value"
       (change)="container.updateFieldValue(getValue($event.target))"
       (blur)="container.triggerFieldChange(getValue($event.target))"
     ></textarea>
     {{ container.config.helperText }}
     {{ container.config.validatemessage }}
-  </label> `,
+  </label>`,
+  standalone: false
 })
-export class RichTextComponent extends PContainerComponent implements OnInit {
-  public control = new FormControl('');
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-    this.control.setValue(this.container.config.value);
-  }
-
-  public get type(): string {
-    return this.container.config.fieldMetadata?.type === 'Decimal'
-      ? 'number'
-      : 'text';
-  }
+export class RichTextComponent extends PContainerComponent {
 
   public getValue(target: EventTarget | null): string | number {
-    return this.type === 'number'
-      ? (target as HTMLInputElement).valueAsNumber
-      : (target as HTMLInputElement).value;
+    return (target as HTMLTextAreaElement).value;
   }
 }

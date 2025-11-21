@@ -24,14 +24,20 @@ interface Address {
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of model.data; index as i" (click)="selectAddress(i)">
-        <td *ngFor="let col of row">{{col}}</td>
-      </tr>
+      @for(row of model.data; track i; let i = $index) {
+        <tr (click)="selectAddress(i)">
+          @for(col of row; track col) {
+            <td>{{col}}</td>
+          }
+        </tr>
+      }
     </tbody>
-  
-  <div *ngIf="address">
-    {{address.OrganisationName}} {{address.BuildingNumber}} {{address.AddressLine}} {{address.Postcode}} {{address.Town}}
-  </div>`
+    @if(address) {
+    <div>
+      {{address.OrganisationName}} {{address.BuildingNumber}} {{address.AddressLine}} {{address.Postcode}} {{address.Town}}
+    </div>
+    }`,
+  standalone: false
 })
 export class AddressLookupComponent extends PContainerComponent implements OnInit {
     public control = new FormControl('', { updateOn: 'blur' });

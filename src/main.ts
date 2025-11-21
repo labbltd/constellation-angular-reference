@@ -1,6 +1,6 @@
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { platformBrowser } from '@angular/platform-browser';
 import { PegaModule } from './pega/pega.module';
 
-platformBrowserDynamic()
+platformBrowser()
   .bootstrapModule(PegaModule)
   .catch((err: any) => console.error(err));

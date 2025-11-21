@@ -8,24 +8,31 @@ import { ModalViewContainer } from '@labb/dx-engine';
   template: `
     <dialog #dialog>
       <h3>{{container.heading}}</h3>
-      <ng-container *ngIf="container.children.length > 0"
-        dxContainer
-        [container]="container.children[0]"
-      ></ng-container>
-      <button
-        *ngFor="let button of container.actionButtons.secondary"
-        [disabled]="loading"
-        (click)="buttonClick(button)">
-        {{ button.name }}
-      </button>
-      <button
-        *ngFor="let button of container.actionButtons.main"
-        [disabled]="loading"
-        (click)="buttonClick(button)">
-        {{ button.name }}
-      </button>
+      @for (child of container.children; track child.id) {
+        <ng-container
+          dxContainer
+          [container]="child"
+        ></ng-container>
+      }
+      @if (container.actionButtons) {
+        @for (button of container.actionButtons.secondary; track button.actionID) {
+          <button
+            [disabled]="loading"
+            (click)="buttonClick(button)">
+            {{ button.name }}
+          </button>
+        }
+        @for (button of container.actionButtons.main; track button.actionID) {
+          <button
+            [disabled]="loading"
+            (click)="buttonClick(button)">
+            {{ button.name }}
+          </button>
+        }
+      }
     </dialog>
   `,
+  standalone: false
 })
 export class ModalViewContainerComponent extends PContainerComponent<ModalViewContainer> implements OnInit {
   @ViewChild('dialog') public dialog!: ElementRef;
