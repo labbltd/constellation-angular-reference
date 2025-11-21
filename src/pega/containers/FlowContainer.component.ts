@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 import { ActionButton, Assignment } from '@labb/constellation-core-types';
 import { FlowContainer } from '@labb/dx-engine';
@@ -6,57 +6,91 @@ import { FlowContainer } from '@labb/dx-engine';
 @Component({
   selector: 'dx-flow-container',
   template: `
-    @if (!container.hasAssignment()) {
-      @for (assignment of todoAssignments; track assignment.ID) {
+    <form>
+      @for (message of container.config.caseMessages; track message) {
         <div>
-          <div>{{assignment.processName}} > {{assignment.name}}</div>
-          <div>Assigned to {{assignment.assigneeInfo?.name}}</div>
-          <button type="button" (click)="openAssignment(assignment)">Go</button>
+          {{message}}
         </div>
       }
-    }
-    @if (container.hasAssignment()) {
-      <h2>
-        {{ container.getActiveViewLabel() || container.getAssignmentName() }}
-      </h2>
-      @if (container.navigation) {
-        <nav>
-          <ol>
-            @for (step of container.navigation.steps; track step.ID) {
-              <li>{{step.name}} [{{step.visited_status}}]</li>
-            }
-          </ol>
-        </nav>
-      }
-      @for (child of container.children; track child.id) {
-        <ng-container
-          dxContainer
-          [container]="child"
-        ></ng-container>
-      }
-      @if (container.actionButtons) {
-        @for (button of container.actionButtons.secondary; track button.actionID) {
-          <button
-            [disabled]="loading"
-            (click)="buttonClick(button)">
-            {{ button.name }}
-          </button>
+      @if (!container.hasAssignment()) {
+          @for(assignment of todoAssignments; track assignment.ID) {
+            <div>
+              <div>{{assignment.processName}} > {{assignment.name}}</div>
+              <div>Assigned to {{assignment.assigneeInfo?.name}}</div>
+              <button type="button" (click)="openAssignment(assignment)">Go</button>
+            </div>
+          }
+      } @else {
+        @if (container.navigation) {
+          <nav>
+            <ol>
+              @for (step of container.navigation.steps; track step.ID) {
+                <li>{{step.name}} [{{step.visited_status}}]</li>
+              }
+            </ol>
+          </nav>
         }
-        @for (button of container.actionButtons.main; track button.actionID) {
-          <button
-            [disabled]="loading"
-            (click)="buttonClick(button)">
-            {{ button.name }}
-          </button>
+        @for (message of container.config.pageMessages; track message.message) {
+          <div>
+            {{message.type}}: {{message.message}}
+          </div>
         }
+        <fieldset>
+          <legend>
+            <h2>
+              {{title}}
+            </h2>
+          </legend>
+          @for (child of container.children; track child.id) {
+            <ng-container dxContainer [container]="child"/>
+          }
+        </fieldset>
+        @if (container.actionButtons) {
+          @for (button of container.actionButtons.secondary; track button.actionID) {
+            <button
+              type="button"
+              [disabled]="loading"
+              (click)="buttonClick(button)">
+              {{ button.name }}
+            </button>
+          }
+          @for (button of container.actionButtons.main; track button.actionID) {
+            <button
+              type="button"
+              [disabled]="loading"
+              (click)="buttonClick(button)">
+              {{ button.name }}
+            </button>
+          }
+        }
+        <div>{{ errorMessage }}</div>
       }
-      <div>{{ errorMessage }}</div>
-    }
+    </form>
   `,
   standalone: false
 })
-export class FlowContainerComponent extends PContainerComponent<FlowContainer> implements OnInit {
+export class FlowContainerComponent extends PContainerComponent<FlowContainer> implements OnInit, OnDestroy {
   public todoAssignments: Assignment[] = [];
+  public errorMessage?: string;
+  public loading = false;
+
+  public get title(): string {
+    const caseInfo = this.container.pconnect.getDataObject().caseInfo;
+    const assignment = caseInfo?.assignments?.[0] as any;
+    const stepName = this.container.navigation?.steps?.find(step => step.visited_status === 'current')?.name;
+    if (assignment.processName === 'Booking') {
+      return assignment.processName;
+    }
+    if (assignment?.isMultiStep === true || assignment?.isMultiStep === 'true') {
+      if (assignment.name === stepName) {
+        return assignment.name;
+      } else {
+        return assignment?.processName;
+      }
+    } else {
+      return assignment?.name;
+    }
+  }
 
   public override ngOnInit(): void {
     super.ngOnInit();
@@ -66,8 +100,13 @@ export class FlowContainerComponent extends PContainerComponent<FlowContainer> i
     });
   }
 
-  public errorMessage?: string;
-  public loading = false;
+  public openAssignment(assignment: Assignment) {
+    this.container.openAssignment(assignment);
+  }
+
+  private updateAssignments(): void {
+    this.todoAssignments = this.container.getTodoAssignments();
+  }
 
   public async buttonClick(button: ActionButton): Promise<void> {
     try {
@@ -81,11 +120,4 @@ export class FlowContainerComponent extends PContainerComponent<FlowContainer> i
     this.loading = false;
   }
 
-  public openAssignment(assignment: Assignment) {
-    this.container.openAssignment(assignment);
-  }
-
-  private updateAssignments(): void {
-    this.todoAssignments = this.container.getTodoAssignments();
-  }
 }

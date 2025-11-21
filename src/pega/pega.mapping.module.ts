@@ -6,24 +6,30 @@ import {
   PContainerModule,
 } from '@labb/angular-adapter';
 import { ActionableButtonComponent } from './containers/ActionableButton.component';
-import { AddressLookupComponent } from './containers/AddressLookup.component';
-import { AppShellComponent } from './containers/AppShell.component';
 import { AttachmentComponent } from './containers/Attachment.component';
-import { CaseViewComponent } from './containers/CaseView.component';
+import { DxAutocompleteComponent } from './containers/AutoComplete.component';
+import { CaseSummaryComponent } from './containers/CaseSummary.component';
 import { CheckboxComponent } from './containers/Checkbox.component';
 import { DefaultComponent } from './containers/Default.component';
 import { DefaultFormComponent } from './containers/DefaultForm.component';
 import { DetailsComponent } from './containers/Details.component';
 import { DetailsThreeColumnComponent } from './containers/DetailsThreeColumns';
+import { DetailsTwoColumnComponent } from './containers/DetailsTwoColumns';
 import { DropdownComponent } from './containers/Dropdown.component';
+import { DxFieldGroupListItem } from './containers/FieldGroupListItem';
 import { FlowContainerComponent } from './containers/FlowContainer.component';
+import { ListViewComponent } from './containers/ListView.component';
+import { LocationComponent } from './containers/Location.component';
+import { MaskedInputComponent } from './containers/MaskedInput.component';
 import { ModalViewContainerComponent } from './containers/ModalViewContainer.component';
-import { OneColumnComponent } from './containers/OneColumn.component';
+import { MultiselectComponent } from './containers/Multiselect.component';
 import { RadioButtonsComponent } from './containers/RadioButtons.component';
-import { RichTextComponent } from './containers/RichText.component';
+import { SignatureComponent } from './containers/Signature.component';
+import { DxSimpleTable } from './containers/SimpleTable';
+import { SimpleTableManualComponent } from './containers/SimpleTableManual.component';
 import { TextAreaComponent } from './containers/TextArea.component';
 import { TextInputComponent } from './containers/TextInput.component';
-import { MultiselectComponent } from './containers/Multiselect.component';
+import { ViewComponent } from './containers/View.component';
 
 @NgModule({
   imports: [CommonModule, ReactiveFormsModule, PContainerModule],
@@ -31,45 +37,53 @@ import { MultiselectComponent } from './containers/Multiselect.component';
     DropdownComponent,
     TextInputComponent,
     RadioButtonsComponent,
-    OneColumnComponent,
     DefaultComponent,
     DefaultFormComponent,
     FlowContainerComponent,
-    CaseViewComponent,
     ModalViewContainerComponent,
     AttachmentComponent,
-    AppShellComponent,
     TextAreaComponent,
-    RichTextComponent,
     DetailsComponent,
-    AddressLookupComponent,
     DetailsThreeColumnComponent,
     CheckboxComponent,
+    ViewComponent,
     ActionableButtonComponent,
-    MultiselectComponent
+    MultiselectComponent,
+    ListViewComponent,
+    SimpleTableManualComponent,
+    DetailsTwoColumnComponent,
+    CaseSummaryComponent,
+    SignatureComponent,
+    LocationComponent,
+    MaskedInputComponent,
+    DxAutocompleteComponent,
+    DxFieldGroupListItem,
+    DxSimpleTable
   ],
   providers: [
     {
       provide: DYNAMIC_CONTAINERS,
       useValue: {
         default: DefaultComponent,
+
         // layouts
-        AppShell: AppShellComponent,
-        CaseView: CaseViewComponent,
-        Details: DetailsComponent,
+        CaseSummary: CaseSummaryComponent,
         DefaultForm: DefaultFormComponent,
-        FlowContainer: FlowContainerComponent,
-        ModalViewContainer: ModalViewContainerComponent,
-        OneColumn: OneColumnComponent,
-        PreviewViewContainer: DefaultComponent,
-        reference: DefaultComponent,
-        Region: DefaultComponent,
-        RootContainer: DefaultComponent,
-        View: DefaultComponent,
-        ViewContainer: DefaultComponent,
+        Details: DetailsComponent,
         DetailsThreeColumn: DetailsThreeColumnComponent,
+        DetailsTwoColumn: DetailsTwoColumnComponent,
+        FlowContainer: FlowContainerComponent,
+        ListPage: ListViewComponent,
+        ListView: ListViewComponent,
+        ModalViewContainer: ModalViewContainerComponent,
+        SimpleTableManual: SimpleTableManualComponent,
+        SimpleTable: DxSimpleTable,
+        FieldGroupListItem: DxFieldGroupListItem,
+        View: ViewComponent,
+
         // controls
         Attachment: AttachmentComponent,
+        AutoComplete: DxAutocompleteComponent,
         Checkbox: CheckboxComponent,
         Currency: TextInputComponent,
         Date: TextInputComponent,
@@ -78,18 +92,20 @@ import { MultiselectComponent } from './containers/Multiselect.component';
         Dropdown: DropdownComponent,
         Email: TextInputComponent,
         Integer: TextInputComponent,
+        Location: LocationComponent,
         Multiselect: MultiselectComponent,
         Percentage: TextInputComponent,
         Phone: TextInputComponent,
         RadioButtons: RadioButtonsComponent,
-        RichText: RichTextComponent,
+        RichText: TextAreaComponent,
         TextArea: TextAreaComponent,
         TextInput: TextInputComponent,
         Time: TextInputComponent,
+
         // custom controls
-        Labb_dx_ButtonGroup: RadioButtonsComponent,
-        Labb_dx_Address: AddressLookupComponent,
-        Pega_Extensions_ActionableButton: ActionableButtonComponent
+        Pega_Extensions_ActionableButton: ActionableButtonComponent,
+        Pega_Extensions_MaskedInput: MaskedInputComponent,
+        Pega_Extensions_SignatureCapture: SignatureComponent,
       },
       multi: true,
     },

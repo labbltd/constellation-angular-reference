@@ -6,38 +6,35 @@ import { PContainerComponent } from '@labb/angular-adapter';
   template: `
     <div [ngClass]="divClass">
       @for (child of container.children; track child.id) {
-        <ng-container
-          dxContainer
-          [container]="child"
-        ></ng-container>
+        <ng-container dxContainer [container]="child"/>
       }
     </div>
   `,
   styles: [
     `
-      .one-column {
+      .one-column > *{
         display: grid;
         grid-template-columns: repeat(1, 1fr);
         gap: calc(1rem);
       }
     `,
     `
-      .two-column {
+      .two-column > * {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: calc(1rem);
       }
     `,
     `
-      .three-column {
+      .three-column > * {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: calc(1rem);
       }
     `,
   ],
-  standalone: false,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  standalone: false
 })
 export class DefaultFormComponent
   extends PContainerComponent
@@ -46,7 +43,7 @@ export class DefaultFormComponent
 
   public override ngOnInit(): void {
     super.ngOnInit();
-    switch (this.container.config.NumCols ? this.container.config.NumCols : '1') {
+    switch (this.container.config.NumCols ?? '1') {
       case '1':
         this.divClass = 'one-column';
         break;
@@ -60,7 +57,7 @@ export class DefaultFormComponent
         this.divClass = 'one-column';
         break;
     }
-    if (this.container.children.length <= 2) {
+    if (this.container.children[0]?.children.length <= 2) {
       this.divClass = 'one-column';
     }
   }

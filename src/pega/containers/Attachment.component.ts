@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 import { Attachment, FileStatus } from '@labb/dx-engine';
 
@@ -7,7 +7,7 @@ import { Attachment, FileStatus } from '@labb/dx-engine';
   template: `
     <label>
       {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
-      @if (allowMultiple || !container.files.length){
+      @if (allowMultiple || !container.files.length) {
         <input #fileInput type="file" 
           (change)="upload($event)" 
           [multiple]="allowMultiple"
@@ -17,54 +17,55 @@ import { Attachment, FileStatus } from '@labb/dx-engine';
       {{ container.config.validatemessage }}
       {{ container.config.extensions }}
     </label>
-    @if(container.files.length) {
+    @if (container.files.length) {
       <table>
         <thead>
           <tr>
             <th>Name</th>
             <th>Size</th>
             <th>Type</th>
-            <th>Uploaded</th>
-            <th>Error</th>
-            <th>Error Status</th>
             <th>Progress</th>
-            <th>ID</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          @for(file of container.files; track file.id) {
+          @for (file of container.files; track file.id) {
             <tr>
               <td>{{file.name}}</td>
-              <td>{{file.size}}</td>
+              <td>{{container.formatBytes(file.size!)}}</td>
               <td>{{file.type}}</td>
-              <td>{{file.uploaded}}</td>
-              <td>{{file.error}}</td>
-              <td>{{file.errorStatus}}</td>
               <td>{{file.progress}}</td>
-              <td>{{file.id}}</td>
               <td>
-                <button type="button" (click)="remove(file)">delete</button>
-                @if (file.linked) {
-                  <button (click)="download(file)">download</button>
-                }
+                <button type="button" (click)="remove(file)">Delete</button>
+                @if (file.type.startsWith('image')) { <button type="button" (click)="preview(file)">Preview</button> }
               </td>
             </tr>
           }
         </tbody>
       </table>
     }
-    @if(downloadedImage) {
-      <img width="100%" [src]="'data:image/png;base64,' + downloadedImage" />
-    }
+    <dialog #dialogRef>
+      <button type="button" (click)="dialog.nativeElement.close()">Close</button>
+      <img width="100%" [src]="downloadedImage" />
+    </dialog>
   `,
   standalone: false
 })
 export class AttachmentComponent extends PContainerComponent<Attachment> {
+  @ViewChild('dialogRef') dialog!: ElementRef<HTMLDialogElement>;
   public downloadedImage?: string;
 
   public get allowMultiple(): boolean {
     return this.container.config.allowMultiple === 'true';
+  }
+
+  public async preview(file: FileStatus) {
+    if (file.linked) {
+      this.downloadedImage = 'data:image/png;base64,' + await this.container.downloadFile(file.id);
+    } else {
+      this.downloadedImage = file.src;
+    }
+    this.dialog.nativeElement.showModal();
   }
 
   public async upload(e: Event): Promise<void> {

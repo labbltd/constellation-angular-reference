@@ -1,33 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
-import { Dropdown } from '@labb/dx-engine';
 
 @Component({
   selector: 'dx-dropdown-control',
   template: `
-  <label>
-    {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
-    <select
-      [id]="container.id"
-      [value]="container.config.value"
-      (change)="change($event)"
-    >
-      <option disabled selected value="">
-        -- select an option --
-      </option>
-      @for (option of container.listItems; track option.key) {
-        <option [value]="option.key">
-          {{ option.value }}
-        </option>
+    @if (container.config.readOnly) {
+      <dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd>
+    } @else {
+      <label [for]="container.id">
+        {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
+        @if (container.config.helperText) {
+          <span [attr.data-tooltip]="container.config.helperText">?</span>
+        }
+      </label>
+      @if (container.config.validatemessage) {
+        <em>{{ container.config.validatemessage }}</em>
       }
-    </select>
-    {{ container.config.helperText }}
-    {{ container.config.validatemessage }}
-  </label> `,
+      <select
+        [id]="container.id"
+        [disabled]="container.config.disabled"
+        (change)="change($event)"
+      >
+        <option disabled [selected]="!container.config.value" value="">
+          -- select an option --
+        </option>
+        @for (option of container.config.datasource; track option.key) {
+          <option [value]="option.key" [selected]="container.config.value === option.key">
+            {{ option.value }}
+          </option>
+        }
+      </select>
+    }
+    `,
   standalone: false
 })
-export class DropdownComponent extends PContainerComponent<Dropdown> implements OnInit {
+export class DropdownComponent extends PContainerComponent {
   public change(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
     this.container.updateFieldValue(value);

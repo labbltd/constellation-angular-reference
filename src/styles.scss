@@ -942,19 +942,6 @@ h3 {
   margin-bottom: 1.5em;
 }
 
-
-.two-column {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: calc(1rem);
-}
-
-.three-column {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: calc(1rem);
-}
-
 input[type="checkbox"] {
   margin: 15px;
 }

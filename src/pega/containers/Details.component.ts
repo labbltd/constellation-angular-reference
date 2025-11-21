@@ -6,10 +6,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
   template: `
     <dl>
       @for (child of container.children; track child.id) {
-        <ng-container
-          dxContainer
-          [container]="child"
-        ></ng-container>
+        <ng-container dxContainer [container]="child"/>
       }
     </dl>
   `,

@@ -1,27 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
+import { formatters } from '@labb/dx-engine';
 
 @Component({
   selector: 'dx-text-input-control',
   template: `
-  <label>
-    {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
+  @if (container.config.readOnly) {
+    <dt>{{ container.config.label }}</dt><dd>{{format(container.config.value) ?? '--'}}</dd>
+  } @else {
+    <label [for]="container.id">
+      {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
+      @if (container.config.helperText) {
+        <span [attr.data-tooltip]="container.config.helperText">?</span>
+      }
+    </label>
+    @if (container.config.validatemessage) {
+      <em>{{ container.config.validatemessage }}</em>
+    }
     <input
+      [id]="container.id"
       [type]="type"
-      [value]="container.config.value"
       [attr.inputmode]="inputmode"
       [attr.step]="step"
-      [attr.disabled]="container.config.disabled"
       [attr.placeholder]="container.config.placeholder"
+      [disabled]="container.config.disabled"
+      [value]="container.config.value ?? ''"
       (change)="container.updateFieldValue(getValue($event.target))"
       (blur)="container.triggerFieldChange(getValue($event.target))"
     />
-    {{ container.config.helperText }}
-    {{ container.config.validatemessage }}
-  </label>`,
+  }
+  `,
   standalone: false
 })
-export class TextInputComponent extends PContainerComponent implements OnInit {
+export class TextInputComponent extends PContainerComponent {
+  public format(value: any) {
+    if (this.type === 'date') return formatters.Date(value);
+    if (this.type === 'datetime-local') return formatters.DateTime(value);
+    if (this.type === 'time') return formatters.Time(value);
+    if (this.type === 'number' && this.container.config.currencyISOCode) return formatters.Currency(value);
+    return value;
+  }
+
   public get type(): string {
     switch (this.container.config.fieldMetadata?.type) {
       case 'Decimal':

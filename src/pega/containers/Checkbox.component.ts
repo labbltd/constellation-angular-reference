@@ -4,28 +4,32 @@ import { PContainerComponent } from '@labb/angular-adapter';
 @Component({
   selector: 'dx-text-input-control',
   template: `
-    <div>
-      <label [for]="container.id">
-        {{container.config.label}}
+    @if(container.config.readOnly) {
+        <dt>{{container.config.caption}}</dt><dd>{{container.config.value ? container.config.trueLabel : container.config.falseLabel}}</dd>
+    } @else {
+      <div>
+        <label [for]="container.id">
         <input
           [id]="container.id"
-          [checked]="container.config.value"
           type="checkbox"
-          [attr.disabled]="container.config.disabled"
+          [disabled]="container.config.disabled"
+          [checked]="container.config.value"
           (change)="change($event)"
         />
         {{ container.config.caption }}{{ container.config.required ? ' *' : '' }}
-      </label>
-      {{ container.config.helperText }}
-      {{ container.config.validatemessage }}
-    </div>
+        </label>
+        {{ container.config.helperText }}
+        {{ container.config.validatemessage }}
+      </div>
+    }
    `,
   standalone: false
 })
 export class CheckboxComponent extends PContainerComponent {
   public change(event: Event) {
-    const value = (event.target as HTMLInputElement).checked;
-    this.container.updateFieldValue(value);
-    this.container.triggerFieldChange(value);
+    if (!event.target) return;
+    const val = (event.target as HTMLInputElement).checked;
+    this.container.updateFieldValue(val);
+    this.container.triggerFieldChange(val);
   }
 }

@@ -7,26 +7,17 @@ import { PContainerComponent } from "@labb/angular-adapter";
         <div class="three-column">
             <div>
                 @for (child of container.children[0].children; track child.id) {
-                    <ng-container
-                        dxContainer
-                        [container]="child"
-                    ></ng-container>
+                    <ng-container dxContainer [container]="child"/>
                 }
             </div>
             <div>
                 @for (child of container.children[1].children; track child.id) {
-                    <ng-container
-                        dxContainer
-                        [container]="child"
-                    ></ng-container>
+                    <ng-container dxContainer [container]="child"/>
                 }
             </div>
             <div>
                 @for (child of container.children[2].children; track child.id) {
-                    <ng-container
-                        dxContainer
-                        [container]="child"
-                    ></ng-container>
+                    <ng-container dxContainer [container]="child"/>
                 }
             </div>
         </div>
