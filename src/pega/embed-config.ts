@@ -69,14 +69,12 @@ export let config = {
     authService: 'pega',
     redirectUrl: 'http://localhost:4203/auth.html',
 
-    // debug information
     xray: false,
 
     /**
      * needed for constellation only
      */
-    action: 'createCase',
-    caseTypeId: '<CaseTypeId>',
+    action: undefined,
 
     // constellation design system location
     staticContentUrl: 'https://release.constellation.pega.io/8.24.52/react/prod/',

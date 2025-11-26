@@ -32,7 +32,9 @@ import { SimpleTableManual } from '@labb/dx-engine';
       <table>
         <thead>
           @for(col of container.fieldDefs; track col.name) {
-            <th>{{col.label}}</th>
+            @if(col.meta?.config?.hide !== true) {
+              <th>{{col.label}}</th>
+            }
           }
         </thead>
         <tbody>

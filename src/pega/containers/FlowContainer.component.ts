@@ -30,6 +30,11 @@ import { FlowContainer } from '@labb/dx-engine';
             </ol>
           </nav>
         }
+        @for (message of container.config.httpMessages; track message.message) {
+          <div>
+            {{message.type}}: {{message.message}}
+          </div>
+        }
         @for (message of container.config.pageMessages; track message.message) {
           <div>
             {{message.type}}: {{message.message}}

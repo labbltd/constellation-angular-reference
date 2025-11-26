@@ -66,7 +66,10 @@ export class LocationComponent extends PContainerComponent<Location> implements 
     }
 
     public async updateSearch(event: Event) {
-        this.suggestions = await this.container.getPlacePredictions((event.target as HTMLInputElement)?.value);
+        const value = (event.target as HTMLInputElement)?.value;
+        await this.container.updateFieldValue(value);
+        await this.container.triggerFieldChange(value);
+        this.suggestions = await this.container.getPlacePredictions(value);
     }
 
     public async select(event: Event) {

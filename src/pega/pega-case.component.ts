@@ -1,59 +1,75 @@
 import { Component, OnInit } from '@angular/core';
-import { OAuth2Service } from '@labb/dx-engine';
+import { BootstrapCaseType, TokenInfo } from '@labb/constellation-core-types';
+import { BootstrapService, OAuth2Service, PContainer } from '@labb/dx-engine';
 import { config } from './embed-config';
 
 @Component({
   selector: 'dx-case',
   template: `
-    @if (config.token) {
-      <dx-pega-entry
-        [caseID]="config.action === 'openCase' ? config.caseId : ''"
-        [caseTypeID]="config.action === 'createCase' ? config.caseTypeId : ''"
-        [assignmentID]="config.assignmentId || ''"
-        [infinityServer]="config.infinityServer"
-        localeID="en-US"
-        [appID]="config.appId || ''"
-        [token]="config.token"></dx-pega-entry>
+    <img height="50px" src="/angular.gif" (click)="showCaseList = true;">
+    @if (container) {
+      <ng-container dxContainer [container]="container"/>
     }
-    @if (!config.token && !config.authError) { <h1>Authentication in progress</h1> }
-    @if (config.authError) { <h1>{{config.authError}}</h1> }
+    @if (showCaseList) {
+      <ul>
+      @for (caseType of caseList; track caseType.pyWorkTypeImplementationClassName) {
+        <li>
+          <a (click)="createCase(caseType.pyWorkTypeImplementationClassName)">
+            {{caseType.pyWorkTypeName}}
+          </a>
+        </li>
+      } 
+    </ul>
+    }
   `,
   standalone: false
 })
 export class PegaCaseComponent implements OnInit {
-  public config: any = {};
+  public container!: PContainer;
+  public showCaseList!: boolean;
+  public caseList!: BootstrapCaseType[];
 
   async ngOnInit(): Promise<void> {
-    this.config = await this.getConfig() as any;
+    let token: TokenInfo;
+    const authConfig = config.authUrl ?
+      {
+        clientId: config.clientId,
+        pkce: config.pkce,
+        authService: config.authService,
+        accessTokenUrl: config.accessTokenUrl,
+        authorizationUrl: config.authUrl,
+        redirectUrl: config.redirectUrl,
+        appId: config.appId
+      } : {
+        accessTokenUrl: config.accessTokenUrl,
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        appId: config.appId
+      };
+    token = config.authUrl ?
+      await OAuth2Service.getTokenAuthorizationCode(authConfig) :
+      await OAuth2Service.getTokenCredentials(authConfig);
+
+      this.container = await BootstrapService.init({
+      appID: config.appId,
+      infinityServer: config.infinityServer,
+      token: token!
+    });
+    this.caseList = window.PCore.getEnvironmentInfo().environmentInfoObject?.pyCaseTypeList ?? [];
+    if (config.action === 'createCase') {
+      await window.PCore.getMashupApi().createCase(config.caseTypeId);
+      this.showCaseList = false;
+    } else if (config.action === 'openCase') {
+      await window.PCore.getMashupApi().openCase(config.caseId);
+      this.showCaseList = false;
+    } else {
+      this.showCaseList = true;
+    }
   }
 
-  async getConfig() {
-    try {
-      return {
-        ...config,
-        token: config.authUrl ?
-          await OAuth2Service.getTokenAuthorizationCode({
-            clientId: config.clientId,
-            pkce: config.pkce,
-            authService: config.authService,
-            accessTokenUrl: config.accessTokenUrl!,
-            authorizationUrl: config.authUrl,
-            redirectUrl: config.redirectUrl,
-            appId: config.appId
-          }) :
-          await OAuth2Service.getTokenCredentials({
-            accessTokenUrl: config.accessTokenUrl,
-            clientId: config.clientId,
-            clientSecret: config.clientSecret,
-            appId: config.appId
-          })
-      }
-    } catch (e) {
-      return {
-        ...config,
-        authError: e
-      }
-    }
+  public async createCase(caseType: string) {
+    await window.PCore.getMashupApi().createCase(caseType);
+    this.showCaseList = false;
   }
 }
 

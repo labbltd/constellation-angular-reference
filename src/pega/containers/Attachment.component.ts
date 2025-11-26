@@ -32,7 +32,7 @@ import { Attachment, FileStatus } from '@labb/dx-engine';
           @for (file of container.files; track file.id) {
             <tr>
               <td>{{file.name}}</td>
-              <td>{{container.formatBytes(file.size!)}}</td>
+              <td>{{file.size != null ? container.formatBytes(file.size!) : '--'}}</td>
               <td>{{file.type}}</td>
               <td>{{file.progress}}</td>
               <td>
