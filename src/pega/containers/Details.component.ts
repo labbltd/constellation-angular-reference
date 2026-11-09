@@ -4,11 +4,11 @@ import { PContainerComponent } from '@labb/angular-adapter';
 @Component({
   selector: 'dx-details-container',
   template: `
-    <dl>
+    <div data-columns="1">
       @for (child of container.children; track child.id) {
         <ng-container dxContainer [container]="child"/>
       }
-    </dl>
+    </div>
   `,
   standalone: false
 })

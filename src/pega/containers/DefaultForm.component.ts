@@ -1,64 +1,29 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PContainerComponent } from '@labb/angular-adapter';
 
 @Component({
   selector: 'dx-default-form-template',
   template: `
-    <div [ngClass]="divClass">
+    <div [attr.data-columns]="columns">
       @for (child of container.children; track child.id) {
         <ng-container dxContainer [container]="child"/>
       }
     </div>
   `,
-  styles: [
-    `
-      .one-column > *{
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        gap: calc(1rem);
-      }
-    `,
-    `
-      .two-column > * {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: calc(1rem);
-      }
-    `,
-    `
-      .three-column > * {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: calc(1rem);
-      }
-    `,
-  ],
-  encapsulation: ViewEncapsulation.None,
   standalone: false
 })
 export class DefaultFormComponent
   extends PContainerComponent
   implements OnInit {
-  public divClass = 'one-column';
+  /** Number of field columns: Pega's NumCols, or one column when the region has two fields or fewer. */
+  public columns = '1';
 
   public override ngOnInit(): void {
     super.ngOnInit();
-    switch (this.container.config.NumCols ?? '1') {
-      case '1':
-        this.divClass = 'one-column';
-        break;
-      case '2':
-        this.divClass = 'two-column';
-        break;
-      case '3':
-        this.divClass = 'three-column';
-        break;
-      default:
-        this.divClass = 'one-column';
-        break;
-    }
+    const numCols = this.container.config.NumCols ?? '1';
+    this.columns = ['1', '2', '3'].includes(numCols) ? numCols : '1';
     if (this.container.children[0]?.children.length <= 2) {
-      this.divClass = 'one-column';
+      this.columns = '1';
     }
   }
 }

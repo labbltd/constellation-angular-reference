@@ -6,25 +6,30 @@ import { ModalViewContainer } from '@labb/dx-engine';
 @Component({
   selector: 'dx-modal-view-container',
   template: `
-    <dialog #dialog>
-      <h3>{{container.heading}}</h3>
+    <dialog #dialog [attr.aria-labelledby]="container.id + '-heading'">
+      <h2 [id]="container.id + '-heading'">{{container.heading}}</h2>
       @for (child of container.children; track child.id) {
         <ng-container dxContainer [container]="child"/>
       }
-      @for (button of container.actionButtons.secondary; track button.actionID) {
-        <button
-          [disabled]="loading"
-          (click)="buttonClick(button)">
-          {{ button.name }}
-        </button>
+      @if (errorMessage) {
+        <p role="alert">{{ errorMessage }}</p>
       }
-      @for (button of container.actionButtons.main; track button.actionID) { 
-        <button
-          [disabled]="loading"
-          (click)="buttonClick(button)">
-          {{ button.name }}
-        </button>
-      }
+      <menu>
+        @for (button of container.actionButtons.secondary; track button.actionID) {
+          <li>
+            <button type="button" [disabled]="loading" (click)="buttonClick(button)">
+              {{ button.name }}
+            </button>
+          </li>
+        }
+        @for (button of container.actionButtons.main; track button.actionID) {
+          <li>
+            <button type="button" [disabled]="loading" (click)="buttonClick(button)">
+              {{ button.name }}
+            </button>
+          </li>
+        }
+      </menu>
     </dialog>
   `,
   standalone: false

@@ -7,30 +7,33 @@ import { Location } from "@labb/dx-engine";
     selector: 'dx-location',
     template: `
          @if (container.config.readOnly) {
-            <dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd>
+            <dl><dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd></dl>
         } @else {
-            <label [for]="container.id">
-            {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
-            @if (container.config.helperText) {
-                <span [attr.data-tooltip]="container.config.helperText">?</span>
-            }
-            </label>
-            @if (container.config.validatemessage) {
-                <em>{{ container.config.validatemessage }}</em>
-            }
-            <input type="text" [formControl]="searchControl" 
+            <div>
+            <label [for]="container.id">{{ container.config.label }}{{ container.config.required ? ' *' : '' }}</label>
+            <input type="text" [formControl]="searchControl"
                 (change)="updateSearch($event)"
-                [id]="container.id">
-        
+                [id]="container.id"
+                [attr.aria-required]="container.config.required || null"
+        [attr.aria-invalid]="container.config.validatemessage ? 'true' : null"
+        [attr.aria-describedby]="container.config.validatemessage || container.config.helperText ? container.id + '-info' : null">
             @if(suggestions.length > 0) {
-                <select [formControl]="selectControl" (change)="select($event)">
+                <select [formControl]="selectControl" (change)="select($event)"
+                    [attr.aria-label]="'Select ' + container.config.label">
                     <option value selected>Select {{container.config.label}}...</option>
                     @for(suggestion of suggestions; track suggestion) {
                         <option [value]="suggestion">{{suggestion}}</option>
                     }
                 </select>
             }
-            <div #map [attr.style]="'height: 25rem; margin-bottom: 1.5rem; display: ' + (container.config.value ? 'block' : 'none')"></div>
+            @if (container.config.validatemessage) {
+        <small role="alert" [id]="container.id + '-info'">{{ container.config.validatemessage }}</small>
+      } @else if (container.config.helperText) {
+        <small [id]="container.id + '-info'">{{ container.config.helperText }}</small>
+      }
+            <!-- The map library needs an element with an explicit height. -->
+            <div #map style="height: 25rem; margin-top: 0.75rem" [hidden]="!container.config.value"></div>
+            </div>
         }
     `,
     standalone: false

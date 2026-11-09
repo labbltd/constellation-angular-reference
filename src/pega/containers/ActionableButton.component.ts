@@ -4,9 +4,7 @@ import { PContainerComponent } from '@labb/angular-adapter';
 @Component({
   selector: 'dx-actionable-button-container',
   template: `
-    <div>
-      <button type="button" (click)="performAction()">{{container.config.label}}</button>
-    </div>
+    <button type="button" (click)="performAction()">{{container.config.label}}</button>
   `,
   standalone: false
 })

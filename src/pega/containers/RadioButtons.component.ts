@@ -4,7 +4,9 @@ import { PContainerComponent } from '@labb/angular-adapter';
 @Component({
   selector: 'dx-radio-buttons-control',
   template: `
-    <fieldset>
+    <fieldset
+      [attr.aria-invalid]="container.config.validatemessage ? 'true' : null"
+      [attr.aria-describedby]="container.config.validatemessage || container.config.helperText ? container.id + '-info' : null">
       <legend>
         {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
       </legend>
@@ -20,8 +22,11 @@ import { PContainerComponent } from '@labb/angular-adapter';
           />{{ option.value }}
         </label>
       }
-      {{ container.config.helperText }}
-      {{ container.config.validatemessage }}
+      @if (container.config.validatemessage) {
+        <small role="alert" [id]="container.id + '-info'">{{ container.config.validatemessage }}</small>
+      } @else if (container.config.helperText) {
+        <small [id]="container.id + '-info'">{{ container.config.helperText }}</small>
+      }
     </fieldset>
   `,
   standalone: false

@@ -5,22 +5,24 @@ import SignaturePad from 'signature_pad';
 @Component({
   selector: 'dx-signature-capture',
   template: `
-    <label [for]="container.id">{{container.config.label}}</label>
     @if (container.config.readOnly) {
-      <img [src]="container.config.value">
+      <dl>
+        <dt>{{container.config.label}}</dt>
+        <dd>
+          @if (container.config.value) { <img [src]="container.config.value" [alt]="container.config.label"> } @else { -- }
+        </dd>
+      </dl>
     }
     @if (!container.config.readOnly) {
-      <canvas style="width: 100%; height: 200px; border: 1px dashed" #canvas></canvas>
-      <button type="button" (click)="onClear()">
-        Clear
-      </button>
-      <button type="button" (click)="onAccept()"
-        [disabled]="!hasValueChanged">
-        Accept
-      </button>
-      @if(info) {
-        <div>{{info}}</div>
-      }
+      <fieldset>
+        <legend>{{container.config.label}}{{ container.config.required ? ' *' : '' }}</legend>
+        <canvas #canvas role="img" [attr.aria-label]="'Signature pad for ' + container.config.label"></canvas>
+        <menu>
+          <li><button type="button" (click)="onClear()">Clear</button></li>
+          <li><button type="button" (click)="onAccept()" [disabled]="!hasValueChanged">Accept</button></li>
+        </menu>
+        <output>{{info}}</output>
+      </fieldset>
     }
   `,
   standalone: false

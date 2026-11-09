@@ -7,25 +7,29 @@ import IMask from 'imask';
   selector: 'dx-masked-input-control',
   template: `
   @if (container.config.readOnly) {
-    <dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd>
+    <dl><dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd></dl>
   }
   @if (!container.config.readOnly) {
-    <label [for]="container.id">
-      {{ container.config.label }}{{ container.config.required ? ' *' : '' }} ({{ container.config.mask }})
-      @if(container.config.helperText) {
-        <span [attr.data-tooltip]="container.config.helperText">?</span>
+    <div>
+      <label [for]="container.id">{{ container.config.label }}{{ container.config.required ? ' *' : '' }} <small>({{ container.config.mask }})</small></label>
+      <input
+        #input
+        [id]="container.id"
+        type="text"
+        [attr.aria-required]="container.config.required || null"
+        [attr.aria-invalid]="container.config.validatemessage ? 'true' : null"
+        [attr.aria-describedby]="container.config.validatemessage || container.config.helperText ? container.id + '-info' : null"
+        [attr.placeholder]="container.config.placeholder"
+        [value]="container.config.value"
+        (change)="container.updateFieldValue($event.target.value)"
+        (blur)="container.triggerFieldChange($event.target.value)"
+      />
+      @if (container.config.validatemessage) {
+        <small role="alert" [id]="container.id + '-info'">{{ container.config.validatemessage }}</small>
+      } @else if (container.config.helperText) {
+        <small [id]="container.id + '-info'">{{ container.config.helperText }}</small>
       }
-    </label>
-    <input
-      #input
-      [id]="container.id"
-      type="text"
-      [attr.placeholder]="container.config.placeholder"
-      [value]="container.config.value"
-      (change)="container.updateFieldValue($event.target.value)"
-      (blur)="container.triggerFieldChange($event.target.value)"
-    />
-    @if(container.config.validatemessage) { <span>{{ container.config.validatemessage }}</span> }
+    </div>
   }
   `,
   standalone: false

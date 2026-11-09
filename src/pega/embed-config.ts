@@ -5,59 +5,60 @@ export interface EmbedConfig {
 
     // pega instance
     infinityServer: string;
+    localeId?: string;
 
     // authorization scoping
-    appId: string;
+    appId?: string;
 
     // client registration information
-    clientId: string;
-    clientSecret: string;
-    pkce: true,
-    authService: string;
-    accessTokenUrl: string;
-    authUrl: string;
-    revokeUrl: string;
-    redirectUrl: string;
+    clientId?: string;
+    clientSecret?: string;
+    pkce?: true,
+    authService?: string;
+    accessTokenUrl?: string;
+    authUrl?: string;
+    revokeUrl?: string;
+    redirectUrl?: string;
 
     // action=createCase
-    caseTypeId: string;
-    startingFields: Record<string, any> | undefined;
-    
+    caseTypeId?: string;
+    startingFields?: Record<string, any> | undefined;
+
     // action=openCase
-    caseId: string;
-    
+    caseId?: string;
+
     // action=openAssignment
-    assignmentId: string;
-    
+    assignmentId?: string;
+
     // action=openPage
-    pageId: string;
-    className: string;
+    pageId?: string;
+    className?: string;
 
     // debug information
-    xray: false,
+    xray?: false,
 
     /**
      * needed for constellation only
      */
 
     // constellation design system location
-    staticContentUrl: string;
+    staticContentUrl?: string;
 
     // authentication mechanism
-    grantType: string; //authCode, customBearer, none, clientCreds, passwordCreds
+    grantType?: string; //authCode, customBearer, none, clientCreds, passwordCreds
 
     // which action to perform
-    action: string; //openCase, createCase, getNextWork, openAssignment, openPage
+    action?: string; //openCase, createCase, getNextWork, openAssignment, openPage
 
     // what page to use for showing a case type
-    casePage: string; //full, assignment, assignmentWithStages, simplifiedAssignment
-    assignmentHeader: true,
-    themeID: string;
+    casePage?: string; //full, assignment, assignmentWithStages, simplifiedAssignment
+    assignmentHeader?: boolean,
+    themeID?: string;
     // https://docs.pega.com/bundle/platform/page/platform/user-experience/design-tokens-constellation.html
-    theme: Record<string, any>;
+    theme?: Record<string, any>;
 }
 
-export let config = {
+export let config = Object.assign({
     /**
      * needed for reference implementation and constellation
      */
@@ -88,4 +89,4 @@ export let config = {
     casePage: 'assignment', //full, assignment, assignmentWithStages, simplifiedAssignment
     assignmentHeader: true,
 
-} as unknown as EmbedConfig;
+}, localStorage.getItem('embedConfig') ? JSON.parse(localStorage.getItem('embedConfig')!) : {}) as EmbedConfig;

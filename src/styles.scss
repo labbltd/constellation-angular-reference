@@ -1,951 +1,778 @@
-/* Classless.css v1.1
+/*
+ * Classless stylesheet for the Constellation reference implementation.
+ *
+ * Every rule targets semantic HTML: elements, ARIA roles and states, and native attributes.
+ * There are no classes. The only presentational hooks are two data attributes:
+ *   - data-columns="1|2|3"  a grid of fields (Pega's NumCols has no semantic HTML equivalent);
+ *   - data-variant="…"      the severity of a group of page messages (urgent, warning, info, success).
+ *
+ * Markup conventions the stylesheet relies on:
+ *   - An editable field is a <div> holding <label>, the control, and an optional <small>.
+ *     The control carries aria-invalid="true" when the field has a validation error.
+ *     A <small role="alert"> is an error message; a plain <small> is helper text.
+ *   - A read-only field is a <dl> with one <dt> (label) and one <dd> (value).
+ *   - A group of related fields is a <fieldset> with a <legend>.
+ *   - A list of commands is a <menu> of <li><button>. In a <form> or <dialog> action bar
+ *     (form > menu, dialog > menu) the last command is the primary action.
+ *   - Tables are wrapped in a <figure>, which scrolls horizontally when the table is too wide.
+ *   - Messages use role="alert" (errors) or role="status" (information).
+ */
 
-Table of Contents:
- 1. Theme Settings
- 2. Reset
- 3. Base Style
- 4. Extras  (remove unwanted)
- 5. Classes  (remove unwanted)
-*/
+/* 1. Design tokens ------------------------------------------------------------------------ */
 
-/* 1. Theme Settings ––––––––––––––––––––-–––––––––––––– */
 :root {
-  --clr-base-dk: #061d3b;
-  --clr-accent-dk: #1e1e1e;
-  --clr-base-lt: #fff;
-  --clr-accent-lt: #d3d0d0;
-  --clr-primary: #44c2fd;
-  --ff-base: "Inter", Arial;
-  --navpos: absolute;
-  --width: 768px;
-  --rem: 18px;
-  --font-p: 1em/1.6 var(--ff-base), Arial, sans-serif;
-  --font-h: 1em/1.6 var(--ff-base), Arial, sans-serif;
-  --font-c: 86%/1.4 monospace;
-  --ornament: "‹‹‹ ›››";
-  --border: 1px solid var(--cmed);
-  /* foreground   | background color */
-  --cfg: var(--clr-base-dk);
-  --cbg: var(--clr-base-lt);
-  --cdark: var(--clr-accent-dk);
-  --clight: var(--clr-base-lt);
-  --cmed: var(--clr-accent-lt);
-  --clink: var(--clr-base-dk);
-  --cemph: var(--clr-primary);
-  --cemphbg: var(--clr-base-lt);
-  --btn-radius: 30px;
+  color-scheme: light dark;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text: #1d2433;
+  --text-muted: #5b6577;
+  --bg: #ffffff;
+  --surface: #f4f6f9;
+  --border: #cdd4df;
+  --border-strong: #9aa5b5;
+
+  --accent: #1f5bd8;
+  --accent-hover: #1847ab;
+  --accent-text: #ffffff;
+  --accent-soft: #eaf0fc;
+
+  --danger: #b42318;
+  --danger-soft: #fdeceb;
+  --warning: #8a5300;
+  --warning-soft: #fff4df;
+  --success: #1c7a43;
+  --success-soft: #e7f5ed;
+
+  --radius: 0.375rem;
+  --gap: 1rem;
+  --measure: 72rem;
+  --control-height: 2.5rem;
+  --shadow: 0 1rem 3rem rgb(15 20 30 / 0.25);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e5e9f0;
+    --text-muted: #9ba5b6;
+    --bg: #12151b;
+    --surface: #1b2029;
+    --border: #353d4b;
+    --border-strong: #5a6578;
 
-/* 2. Reset –––––––––––––––––––––––––––––––––––––––––––– */
+    --accent: #6f9dff;
+    --accent-hover: #93b5ff;
+    --accent-text: #0b1020;
+    --accent-soft: #1b2640;
 
-/* reset block elements  */
-* {
+    --danger: #ff8b80;
+    --danger-soft: #3a1c1b;
+    --warning: #ffc266;
+    --warning-soft: #352914;
+    --success: #6fd49a;
+    --success-soft: #15301f;
+
+    --shadow: 0 1rem 3rem rgb(0 0 0 / 0.6);
+  }
+}
+
+/* 2. Reset --------------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-  border-spacing: 0;
-  margin: 0;
-  padding: 0;
 }
 
-header,
-footer,
-figure,
-video,
-details,
-blockquote,
-ul,
-ol,
-dl,
-fieldset,
-pre,
-pre>code {
-  display: block;
-  margin: .5rem 0 1rem;
-  width: 100%;
-  text-align: left;
+[hidden] {
+  display: none !important;
 }
 
-video,
-summary,
-input,
-select {
-  outline: none;
+/*
+ * Framework host elements (such as Angular's <dx-text-input-control>) are custom elements that
+ * are never registered. They must not generate a box, so the semantic elements they contain are
+ * laid out as if the host were not there - the same DOM a React implementation produces.
+ */
+:not(:defined) {
+  display: contents;
 }
 
-/* reset clickable things  (FF Bug: select:hover prevents usage) */
-a,
-button,
-select,
-summary {
-  color: var(--clink);
-  cursor: pointer;
-}
-
-
-/* 3. Base Style ––––––––––––––––––––––––––––––––––––––– */
 html {
-  font-size: var(--rem);
-  background: var(--cbg);
+  font-family: var(--font-sans);
+  font-size: 100%;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  position: relative;
-  margin: auto;
-  max-width: var(--width);
-  font: var(--font-p);
-  color: var(--cfg);
-  padding: 3.0rem .6rem 0;
-  overflow-x: hidden;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2rem) 3rem;
+  color: var(--text);
+  background: var(--bg);
 }
 
-body>footer {
-  margin: 10rem 0 0;
-  font-size: 90%;
-}
+/* 3. Typography ---------------------------------------------------------------------------- */
 
-p {
-  margin: .6em 0;
-}
-
-/* links */
-a[href] {
-  text-decoration: underline solid 1.5px var(--cmed);
-  text-underline-position: under;
-}
-
-a[href^="#"] {
-  text-decoration: none;
-}
-
-a:hover,
-button:not([disabled]):hover,
-summary:hover,
-select:hover {
-  filter: brightness(92%);
-  color: var(--cemph);
-  border-color: var(--cemph);
-}
-
-/* lists */
-ul,
-ol,
-dl {
-  margin: 1rem 0;
-  padding: 0 0 0 2em;
-}
-
-li:not(:last-child),
-dd:not(:last-child) {
-  margin-bottom: .5rem;
-}
-
-dt {
-  font-weight: bold;
-}
-
-/* headings */
 h1,
 h2,
 h3,
 h4,
-h5 {
-  margin: 1.5em 0 .5rem;
-  font: var(--font-h);
-  line-height: 1.2em;
-  clear: both;
-}
-
-h1+h2,
-h2+h3,
-h3+h4,
-h4+h5 {
-  margin-top: .5em;
-  padding-top: 0;
-}
-
-/* non-clashing headings */
-h1 {
-  font-size: 2.2em;
-  font-weight: 300;
-}
-
-h2 {
-  font-size: 2.0em;
-  font-weight: 300;
-  font-variant: small-caps;
-}
-
-h3 {
-  font-size: 1.5em;
-  font-weight: 400;
-}
-
-h4 {
-  font-size: 1.1em;
-  font-weight: 700;
-}
-
-h5 {
-  font-size: 1.2em;
-  font-weight: 400;
-  color: var(--cfg);
-}
-
+h5,
 h6 {
-  font-size: 1.0em;
-  font-weight: 700;
-  font-style: italic;
-  display: inline;
+  margin: 1.5em 0 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
-h6+p {
-  display: inline;
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+h5,
+h6 { font-size: 1rem; }
+
+:is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
 }
 
-/* tables */
-td,
-th {
-  padding: .5em .8em;
-  border-bottom: var(--border);
-  white-space: nowrap;
-  font-size: 95%;
+p,
+ul,
+ol,
+blockquote,
+pre {
+  margin: 0 0 1rem;
 }
 
-thead th[colspan] {
-  padding: .2em .8em;
-  text-align: center;
+:is(p, ul, ol, blockquote, pre):last-child {
+  margin-bottom: 0;
 }
 
-thead tr:not(:only-child) td {
-  padding: .2em .8em;
+ul,
+ol {
+  padding-left: 1.5rem;
 }
 
-thead+tbody tr:first-child td {
-  border-top: var(--border);
+li + li {
+  margin-top: 0.25rem;
 }
 
-td:first-child,
-th:first-child {
-  text-align: left;
+a {
+  color: var(--accent);
+  text-underline-offset: 0.15em;
 }
 
-tr:hover {
-  background-color: var(--clight);
+a:hover {
+  color: var(--accent-hover);
 }
 
-table img {
-  display: block;
+small {
+  font-size: 0.875rem;
+  color: var(--text-muted);
 }
 
-/* figures */
-img,
-svg {
-  max-width: 100%;
-  vertical-align: text-top;
-  object-fit: cover;
-}
-
-p>img:not(:only-child) {
-  float: right;
-  margin: 0 0 .5em .5em;
-}
-
-figure>img {
-  display: inline-block;
-  width: auto;
-}
-
-figure>img:only-of-type,
-figure>svg:only-of-type {
-  max-width: 100%;
-  display: block;
-  margin: 0 auto .4em;
-}
-
-figure>*:not(:last-child) {
-  margin-bottom: .4rem;
-}
-
-/* captions */
-figcaption,
-caption {
-  text-align: left;
-  font: var(--font-h);
-  color: var(--cdark);
-  width: 100%;
-}
-
-figcaption>*:first-child,
-caption>*:first-child {
-  display: inline-block;
-  margin: 0;
-}
-
-table caption:last-child {
-  caption-side: bottom;
-  margin: .5em 0;
-}
-
-/* code */
-pre>code {
-  margin: 0;
-  position: relative;
-  padding: .8em;
-  border-left: .4rem solid var(--cemph);
+strong,
+b {
+  font-weight: 600;
 }
 
 code,
 kbd,
-samp {
-  padding: .2em;
-  font: var(--font-c);
-  background: var(--clight);
-  border-radius: 4px;
-}
-
-kbd {
-  border: 1px solid var(--cmed);
-}
-
-/* misc */
-blockquote {
-  border-left: .4rem solid var(--cmed);
-  padding: 0 0 0 1rem;
-}
-
-time {
-  color: var(--cdark);
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
 }
 
 hr {
+  margin: 2rem 0;
   border: 0;
-  border-top: .1rem solid var(--cmed);
+  border-top: 1px solid var(--border);
 }
 
-nav {
-  width: 100%;
-  background-color: var(--clight);
-}
-
-::selection,
-mark {
-  background: var(--clink);
-  color: var(--cbg);
-}
-
-
-/* 4. Extra Style –––––––––––––––––––––––––––––––––––––– */
-
-/* Auto Numbering: figure/tables/headings/cite */
-article {
-  counter-reset: h2 0 h3 0 tab 0 fig 0 lst 0 ref 0 eq 0;
-}
-
-article figure figcaption:before {
-  color: var(--cemph);
-  counter-increment: fig;
-  content: "Figure " counter(fig) ": ";
-}
-
-/* subfigures */
-figure {
-  counter-reset: subfig 0
-}
-
-article figure figure {
-  counter-reset: none;
-}
-
-article figure>figure {
-  display: inline-grid;
-  width: auto;
-}
-
-figure>figure:not(:last-of-type) {
-  padding-right: 1rem;
-}
-
-article figure figure figcaption:before {
-  counter-increment: subfig 1;
-  content: counter(subfig, lower-alpha) ": ";
-}
-
-/* listings */
-article figure pre+figcaption:before {
-  counter-increment: lst 1;
-  content: "Listing " counter(lst) ": ";
-}
-
-/* tables */
-figure>table:only-of-type {
-  margin: .5em auto !important;
-  width: fit-content;
-}
-
-article figure>table caption {
-  display: table-caption;
-  caption-side: bottom;
-}
-
-article figure>table+figcaption:before,
-article table caption:before {
-  color: var(--cemph);
-  counter-increment: tab 1;
-  content: "Table " counter(tab) ": ";
-}
-
-/* headings */
-article h2,
-h3 {
-  position: relative;
-}
-
-article h2:before,
-article h3:before {
-  display: inline-block;
-  position: relative;
-  font-size: .6em;
-  text-align: right;
-  vertical-align: baseline;
-  left: -1rem;
-  width: 2.5em;
-  margin-left: -2.5em;
-}
-
-article h1 {
-  counter-set: h2;
-}
-
-article h2:before {
-  counter-increment: h2;
-  content: counter(h2) ". ";
-  counter-set: h3;
-}
-
-article h3:before {
-  counter-increment: h3;
-  content: counter(h2) "." counter(h3) ". ";
-}
-
-@media (max-width: 60rem) {
-
-  h2:before,
-  h3:before {
-    display: none;
-  }
-}
-
-/* tooltip + citation */
-article p>cite:before {
-  padding: 0 .5em 0 0;
-  counter-increment: ref;
-  content: " [" counter(ref) "] ";
-  vertical-align: super;
-  font-size: .6em;
-}
-
-article p>cite>*:only-child {
-  display: none;
-}
-
-article p>cite:hover>*:only-child,
-[data-tooltip]:hover:before {
-  display: inline-block;
-  z-index: 40;
-  white-space: pre-wrap;
-  position: absolute;
-  left: 1rem;
-  right: 1rem;
-  padding: 1em 2em;
-  text-align: center;
-  transform: translateY(calc(-100%));
-  content: attr(data-tooltip);
-  color: var(--cbg);
-  background-color: var(--cemph);
-  box-shadow: 0 2px 10px 0 black;
-}
-
-[data-tooltip],
-article p>cite:before {
-  color: var(--clink);
-  border: .8rem solid transparent;
-  margin: -.8rem;
-}
-
-abbr[title],
-[data-tooltip] {
-  cursor: help;
-}
-
-/* navbar */
-nav+* {
-  margin-top: 3rem;
-}
-
-body>nav,
-header nav {
-  position: var(--navpos);
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 41;
-  box-shadow: 0vw -50vw 0 50vw var(--clight), 0 calc(-50vw + 2px) 4px 50vw var(--cdark);
-}
-
-nav ul {
-  list-style-type: none;
-}
-
-nav ul:first-child {
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-}
-
-nav ul:first-child>li {
-  display: inline-block;
-  margin: 0;
-  padding: .8rem .6rem;
-}
-
-nav ul>li>ul {
-  display: none;
-  width: auto;
-  position: absolute;
-  margin: .5rem 0;
-  padding: 1rem 2rem;
-  background-color: var(--clight);
-  border: var(--border);
-  border-radius: 4px;
-  z-index: 42;
-}
-
-nav ul>li>ul>li {
-  white-space: nowrap;
-}
-
-nav ul>li:hover>ul {
+/* Not every <img>: map libraries render tiles that a global max-width would distort. */
+:is(p, dd, dialog, figure) > img {
   display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-@media (max-width: 40rem) {
-  nav ul:first-child>li:first-child:after {
-    content: " \25BE";
-  }
+/* 4. Page layout --------------------------------------------------------------------------- */
 
-  nav ul:first-child>li:not(:first-child):not(.sticky) {
-    display: none;
-  }
-
-  nav ul:first-child:hover>li:not(:first-child):not(.sticky) {
-    display: block;
-    float: none !important;
-    padding: .3rem .6rem;
-  }
-}
-
-/* details/cards */
-summary>* {
-  display: inline;
-}
-
-.card,
-details {
-  display: block;
-  margin: .5rem 0 1rem;
-  padding: 0 .6rem;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.card,
-details[open] {
-  outline: 1px solid var(--cmed);
-}
-
-.card>img:first-child {
-  margin: -3px -.6rem;
-  max-width: calc(100% + 1.2rem);
-}
-
-summary:hover,
-details[open] summary,
-.card>p:first-child {
-  box-shadow: inset 0 0 0 2em var(--clight), 0 -.8rem 0 .8rem var(--clight);
-}
-
-.hint {
-  --cmed: var(--cemph);
-  --clight: var(--cemphbg);
-  background-color: var(--clight);
-}
-
-.warn {
-  --cmed: #c11;
-  --clight: #e221;
-  background-color: var(--clight);
-}
-
-/* big first letter */
-article>section:first-of-type>h2:first-of-type+p:first-letter,
-article>h2:first-of-type+p:first-letter,
-.lettrine {
-  float: left;
-  font-size: 3.5em;
-  padding: .1em .1em 0 0;
-  line-height: .68em;
-  color: var(--cemph);
-}
-
-/* ornaments */
-section:after {
-  display: block;
-  margin: 1em 0;
-  color: var(--cmed);
-  text-align: center;
-  font-size: 1.5em;
-  content: var(--ornament);
-}
-
-/* side menu (aside is not intended for use in a paragraph!) */
-main aside {
-  position: absolute;
-  width: 8rem;
-  right: -8.6rem;
-  font-size: .8em;
-  line-height: 1.4em;
-}
-
-@media (max-width: 70rem) {
-  main aside {
-    display: none;
-  }
-}
-
-/* forms and inputs  */
-textarea,
-input:not([type=range]),
-button,
-select {
-  font: var(--font-h);
-  border-radius: 4px;
-  border: 1.5px solid var(--cmed);
-  padding: .4em .8em;
-  color: var(--cfg);
-  background-color: var(--clight);
-}
-
-button {
-  border-radius: var(--btn-radius)
-}
-
-fieldset select,
-input:not([type=checkbox]):not([type=radio]) {
-  display: block;
-  width: 100%;
-  margin: 0 0 1rem;
-}
-
-fieldset legend h2 {
-  margin: 0 0.5em;
-}
-
-button {
-  font-weight: bold;
-  margin: .5em;
-  border: 1.5px solid var(--clink);
-  color: var(--clink);
-}
-
-button {
-  padding: .4em 1em;
-  font-size: 85%;
-  letter-spacing: .1em;
-}
-
-button[disabled] {
-  color: var(--cdark);
-  border-color: var(--cmed);
-}
-
-fieldset {
-  border-radius: 4px;
-  border: var(--border);
-  padding: .5em 1em;
-}
-
-textarea:hover,
-input:not([type=checkbox]):not([type*='ra']):hover {
-  border: 1.5px solid var(--cemph);
-}
-
-textarea:focus,
-input:not([type=checkbox]):not([type*='ra']):focus,
-select:focus {
-  border: 1.5px solid var(--clr-primary);
-  box-shadow: 0 0 5px var(--clr-primary);
-}
-
-form fieldset *:disabled,
-form fieldset *:disabled:hover {
-  background-color: var(--clr-accent-lt) !important;
-  cursor: default;
-  color: var(--cdark) !important;
-  border-color: var(--clr-accent-lt) !important;
-  filter: brightness(115%);
-}
-
-p>button {
-  padding: 0 .5em;
-  margin: 0 .5em;
-}
-
-p>select {
-  padding: 0;
-  margin: 0 .5em;
-}
-
-
-/* 5. Bootstrap-compatible classes ––––––––––––––––––––– */
-
-/* grid */
-.row {
+body > header,
+:not(:defined) > header {
   display: flex;
-  margin: .5rem -.6rem;
-  align-items: stretch;
+  align-items: center;
+  gap: var(--gap);
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.row [class^="col"] {
-  padding: 0 .6rem;
+header img {
+  display: block;
+  height: 2.5rem;
+  width: auto;
 }
 
-.row .col {
-  flex: 0 4 100%;
+header a {
+  display: inline-flex;
+  border-radius: var(--radius);
 }
 
-.row .col-2 {
-  flex: 0 2 16.66%;
+main {
+  display: block;
 }
 
-.row .col-3 {
-  flex: 0 3 25%;
+/* A grid of fields. One column on narrow screens, the requested number from 48rem. */
+[data-columns] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap) calc(var(--gap) * 1.5);
+  align-items: start;
 }
 
-.row .col-4 {
-  flex: 0 4 33.33%;
+@media (min-width: 48rem) {
+  [data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-.row .col-5 {
-  flex: 0 5 41.66%;
+/* Tables, fields that hold a table, and headed sections take the whole row of a multi-column grid. */
+figure,
+section,
+div:has(> figure) {
+  grid-column: 1 / -1;
 }
 
-.row .col-6 {
-  flex: 0 6 50%;
+/* View instructions. */
+[role="note"] {
+  margin-bottom: var(--gap);
+  color: var(--text-muted);
 }
 
-@media (max-width: 40rem) {
-  .row {
-    flex-direction: column;
-  }
+/* Buttons keep their natural width when they are grid items. */
+button {
+  justify-self: start;
 }
 
-/* align */
-.text-left {
-  text-align: left;
+section {
+  display: grid;
+  gap: var(--gap);
+  align-content: start;
 }
 
-.text-right {
-  text-align: right;
+section > :is(h2, h3, menu) {
+  margin: 0;
 }
 
-.text-center {
-  text-align: center;
+section > h3:first-child {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.float-left {
-  float: left !important;
+/* 5. Forms --------------------------------------------------------------------------------- */
+
+form {
+  display: block;
+  margin-bottom: 2rem;
 }
 
-.float-right {
-  float: right !important;
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
 }
 
-.clearfix {
-  clear: both;
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: inherit;
 }
 
-/* colors */
-.text-black {
-  color: #000;
-}
-
-.text-white {
-  color: #fff;
-}
-
-.text-primary {
-  color: var(--cemph);
-}
-
-.text-secondary {
-  color: var(--cdark);
-}
-
-.bg-white {
-  background-color: #fff;
-}
-
-.bg-light {
-  background-color: var(--clight);
-}
-
-.bg-primary {
-  background-color: var(--cemph);
-}
-
-.bg-secondary {
-  background-color: var(--cmed);
-}
-
-/* margins */
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.m-0 {
-  margin: 0 !important;
-}
-
-.m-1,
-.mx-1,
-.mr-1 {
-  margin-right: 1.0rem !important;
-}
-
-.m-1,
-.mx-1,
-.ml-1 {
-  margin-left: 1.0rem !important;
-}
-
-.m-1,
-.my-1,
-.mt-1 {
-  margin-top: 1.0rem !important;
-}
-
-.m-1,
-.my-1,
-.mb-1 {
-  margin-bottom: 1.0rem !important;
-}
-
-/* pading */
-.p-0 {
-  padding: 0 !important;
-}
-
-.p-1,
-.px-1,
-.pr-1 {
-  padding-right: 1.0rem !important;
-}
-
-.p-1,
-.px-1,
-.pl-1 {
-  padding-left: 1.0rem !important;
-}
-
-.p-1,
-.py-1,
-.pt-1 {
-  padding-top: 1.0rem !important;
-}
-
-.p-1,
-.py-1,
-.pb-1 {
-  padding-bottom: 1.0rem !important;
-}
-
-/* be print friendly */
-@media print {
-  @page {
-    margin: 1.5cm 2cm;
-  }
-
-  html {
-    font-size: 9pt !important;
-  }
-
-  body {
-    max-width: 27cm;
-  }
-
-  p {
-    orphans: 2;
-    widows: 2;
-  }
-
-  caption,
-  figcaption {
-    page-break-before: avoid;
-  }
-
-  h2,
-  h3,
-  h4,
-  h5 {
-    page-break-after: avoid;
-  }
-
-  .noprint,
-  body>nav,
-  section:after {
-    display: none;
-  }
-
-  .row {
-    flex-direction: row;
-  }
-}
-
-legend,
-input:not([type=radio]),
-select {
+input:not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"]),
+select,
+textarea {
   display: block;
   width: 100%;
-}
-
-fieldset label {
-  display: block;
-  margin-top: 0;
-}
-
-em {
-  color: red;
+  min-height: var(--control-height);
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background-color: var(--bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.125rem) 50%,
+    calc(100% - 0.8rem) 50%;
+  background-size: 0.325rem 0.325rem;
+  background-repeat: no-repeat;
+}
+
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+:is(input, select, textarea):focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+[aria-invalid="true"] {
+  border-color: var(--danger) !important;
+}
+
+[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 35%, transparent);
+}
+
+:is(input, select, textarea, button):disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* A checkbox or radio button sits inline with its label. */
+label:has(> input[type="checkbox"], > input[type="radio"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  display: block;
   width: 100%;
+  padding: 0.75rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
 }
 
-dialog {
-  max-width: 50%;
-  margin: auto;
+/* Helper text and error messages below a control. */
+:is(div, fieldset, figure) > small {
+  display: block;
+  margin-top: 0.25rem;
 }
 
-h3 {
-  margin-top: .5em;
-  margin-bottom: 1.5em;
+small[role="alert"] {
+  color: var(--danger);
+  font-weight: 500;
 }
 
-input[type="checkbox"] {
-  margin: 15px;
+fieldset {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0;
+  padding: var(--gap) calc(var(--gap) * 1.25) calc(var(--gap) * 1.25);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+legend {
+  padding: 0 0.375rem;
+  font-weight: 600;
+}
+
+/* A radio group is a single field: no frame, and the legend reads like a label. */
+fieldset:has(> label > input[type="radio"]) {
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+}
+
+fieldset:has(> label > input[type="radio"]) > legend {
+  margin-bottom: 0.25rem;
+  padding: 0;
+  font-weight: 500;
+}
+
+/* The fieldset that wraps a whole assignment is not framed. */
+form > fieldset {
+  padding: 0;
+  border: 0;
+}
+
+form > fieldset > legend {
+  padding: 0;
+}
+
+legend > :is(h1, h2, h3) {
+  margin: 0 0 1rem;
+}
+
+/* A signature pad. */
+fieldset > canvas {
+  display: block;
+  width: 100%;
+  height: 12.5rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  touch-action: none;
+}
+
+output {
+  display: block;
+  color: var(--success);
+  font-size: 0.875rem;
+}
+
+/* 6. Read-only fields ---------------------------------------------------------------------- */
+
+dl {
+  margin: 0;
+}
+
+dt {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 7. Buttons and menus --------------------------------------------------------------------- */
+
+button,
+::file-selector-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: var(--control-height);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+::file-selector-button {
+  height: 2rem;
+  margin-right: 0.75rem;
+  padding: 0.25rem 0.75rem;
+}
+
+button:hover:not(:disabled),
+::file-selector-button:hover {
+  background: var(--surface);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:is(input, select, textarea):focus-visible {
+  outline: none;
+}
+
+/* Compact buttons inside table cells and list items. */
+:is(td, li:not(menu > li)) button {
+  min-height: 2rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.875rem;
+}
+
+menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+menu > li {
+  margin: 0;
+}
+
+/* The action bar of a form or dialog. */
+form > menu,
+dialog > menu {
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* The last command in that action bar is the primary action. */
+:is(form, dialog) > menu > li:last-child > button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+:is(form, dialog) > menu > li:last-child > button:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+/* 8. Navigation: the steps of a multi-step form -------------------------------------------- */
+
+nav {
+  margin-bottom: 2rem;
+}
+
+nav ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+nav ol > li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--text-muted);
+  counter-increment: step;
+}
+
+nav ol > li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  font-size: 0.875rem;
+}
+
+nav ol > li[aria-current] {
+  color: var(--text);
+  font-weight: 600;
+}
+
+nav ol > li[aria-current]::before {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* Steps before the current step are complete. */
+nav ol > li:has(~ li[aria-current])::before {
+  content: "\2713";
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+/* 9. Tables -------------------------------------------------------------------------------- */
+
+figure {
+  margin: 0;
+  overflow-x: auto;
 }
 
 table {
-  margin-bottom: 15px;
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+caption {
+  padding-bottom: 0.5rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  border-bottom: 2px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background: var(--surface);
+}
+
+/* The "No records" row. */
+td[colspan] {
+  padding: 1.5rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+figure > table + * {
+  margin-top: 0.75rem;
+}
+
+/* 10. Messages ----------------------------------------------------------------------------- */
+
+:is(div, p, aside)[role="alert"],
+:is(div, p, aside)[role="status"],
+ul[data-variant] {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-left-width: 4px;
+  border-radius: var(--radius);
+}
+
+:is(div, p, aside)[role="alert"],
+ul[data-variant="urgent"] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+:is(div, p, aside)[role="status"],
+ul[data-variant="info"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+ul[data-variant="warning"] {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+ul[data-variant="success"] {
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+
+ul[data-variant] {
+  padding-left: 2rem;
+}
+
+/* A message box that holds other message boxes is only a frame for focus. */
+div[role="alert"]:has(> ul[data-variant]) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+div[role="alert"] > :last-child {
+  margin-bottom: 0;
+}
+
+[role="alert"] > p,
+[role="status"] > p {
+  margin-bottom: 0;
+}
+
+[role="status"] > menu {
+  margin-top: 0.75rem;
+}
+
+/* 11. Cards, disclosures and dialogs ------------------------------------------------------- */
+
+/* A to-do item: title and details on the left, its action on the right. */
+article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.25rem 1rem;
+  align-items: center;
+  margin: 0 0 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+article > * {
+  grid-column: 1;
+  margin: 0;
+}
+
+article > h3 {
+  font-size: 1rem;
+}
+
+article > p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+article > button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+details {
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+details[open] > summary {
+  margin-bottom: 1rem;
+}
+
+dialog {
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+dialog::backdrop {
+  background: rgb(15 20 30 / 0.55);
+}
+
+dialog > h2 {
+  margin-top: 0;
 }

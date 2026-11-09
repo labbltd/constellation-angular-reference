@@ -6,28 +6,30 @@ import { formatters } from '@labb/dx-engine';
   selector: 'dx-text-input-control',
   template: `
   @if (container.config.readOnly) {
-    <dt>{{ container.config.label }}</dt><dd>{{format(container.config.value) ?? '--'}}</dd>
+    <dl><dt>{{ container.config.label }}</dt><dd>{{format(container.config.value) ?? '--'}}</dd></dl>
   } @else {
-    <label [for]="container.id">
-      {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
-      @if (container.config.helperText) {
-        <span [attr.data-tooltip]="container.config.helperText">?</span>
+    <div>
+      <label [for]="container.id">{{ container.config.label }}{{ container.config.required ? ' *' : '' }}</label>
+      <input
+        [id]="container.id"
+        [attr.aria-required]="container.config.required || null"
+        [attr.aria-invalid]="container.config.validatemessage ? 'true' : null"
+        [attr.aria-describedby]="container.config.validatemessage || container.config.helperText ? container.id + '-info' : null"
+        [type]="type"
+        [attr.inputmode]="inputmode"
+        [attr.step]="step"
+        [attr.placeholder]="container.config.placeholder"
+        [disabled]="container.config.disabled"
+        [value]="container.config.value ?? ''"
+        (change)="container.updateFieldValue(getValue($event.target))"
+        (blur)="container.triggerFieldChange(getValue($event.target))"
+      />
+      @if (container.config.validatemessage) {
+        <small role="alert" [id]="container.id + '-info'">{{ container.config.validatemessage }}</small>
+      } @else if (container.config.helperText) {
+        <small [id]="container.id + '-info'">{{ container.config.helperText }}</small>
       }
-    </label>
-    @if (container.config.validatemessage) {
-      <em>{{ container.config.validatemessage }}</em>
-    }
-    <input
-      [id]="container.id"
-      [type]="type"
-      [attr.inputmode]="inputmode"
-      [attr.step]="step"
-      [attr.placeholder]="container.config.placeholder"
-      [disabled]="container.config.disabled"
-      [value]="container.config.value ?? ''"
-      (change)="container.updateFieldValue(getValue($event.target))"
-      (blur)="container.triggerFieldChange(getValue($event.target))"
-    />
+    </div>
   }
   `,
   standalone: false

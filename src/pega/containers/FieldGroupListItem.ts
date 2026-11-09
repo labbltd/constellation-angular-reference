@@ -5,19 +5,25 @@ import { FieldGroupListItemProps, PContainer } from '@labb/dx-engine';
 @Component({
   selector: 'dx-field-group-list-item',
   template: `
-    @if (container.config.allowDelete) {
-      <button type="button"
-        style="height: 100%"
-        (click)="container.config.deleteFieldGroupItem()">
-        x
-      </button>
-    }
-    @if (container.config.label) {
-      <strong>{{container.config.label}}</strong>
-    }
-    @for(child of container.children; track child.id) {
-      <ng-container dxContainer [container]="child"></ng-container>
-    }
+    <fieldset>
+      @if (container.config.label) {
+        <legend>{{container.config.label}}</legend>
+      }
+      @for(child of container.children; track child.id) {
+        <ng-container dxContainer [container]="child"></ng-container>
+      }
+      @if (container.config.allowDelete) {
+        <menu>
+          <li>
+            <button type="button"
+              [attr.aria-label]="'Delete ' + (container.config.label || 'item')"
+              (click)="container.config.deleteFieldGroupItem()">
+              Delete
+            </button>
+          </li>
+        </menu>
+      }
+    </fieldset>
   `,
   standalone: false
 })

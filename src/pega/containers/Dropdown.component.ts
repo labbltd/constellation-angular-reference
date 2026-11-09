@@ -5,20 +5,16 @@ import { PContainerComponent } from '@labb/angular-adapter';
   selector: 'dx-dropdown-control',
   template: `
     @if (container.config.readOnly) {
-      <dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd>
+      <dl><dt>{{ container.config.label }}</dt><dd>{{container.config.value ?? '--'}}</dd></dl>
     } @else {
-      <label [for]="container.id">
-        {{ container.config.label }}{{ container.config.required ? ' *' : '' }}
-        @if (container.config.helperText) {
-          <span [attr.data-tooltip]="container.config.helperText">?</span>
-        }
-      </label>
-      @if (container.config.validatemessage) {
-        <em>{{ container.config.validatemessage }}</em>
-      }
+      <div>
+      <label [for]="container.id">{{ container.config.label }}{{ container.config.required ? ' *' : '' }}</label>
       <select
         [id]="container.id"
         [disabled]="container.config.disabled"
+        [attr.aria-required]="container.config.required || null"
+        [attr.aria-invalid]="container.config.validatemessage ? 'true' : null"
+        [attr.aria-describedby]="container.config.validatemessage || container.config.helperText ? container.id + '-info' : null"
         (change)="change($event)"
       >
         <option disabled [selected]="!container.config.value" value="">
@@ -30,6 +26,12 @@ import { PContainerComponent } from '@labb/angular-adapter';
           </option>
         }
       </select>
+      @if (container.config.validatemessage) {
+        <small role="alert" [id]="container.id + '-info'">{{ container.config.validatemessage }}</small>
+      } @else if (container.config.helperText) {
+        <small [id]="container.id + '-info'">{{ container.config.helperText }}</small>
+      }
+      </div>
     }
     `,
   standalone: false
